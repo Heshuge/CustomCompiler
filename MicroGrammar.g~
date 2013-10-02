@@ -11,41 +11,38 @@ grammar MicroGrammar;
  * PARSER RULES
  *------------------------------------------------------------------*/
 
+
+
 /* Program */
 
-program			:	'PROGRAM' id 'BEGIN' body 'END'
-			;
+program		:	'PROGRAM' id 'BEGIN' body 'END' {SymbolHashStack.popHash();};
 
-id			:	IDENTIFIER
-			;
+id			:	IDENTIFIER;
 
-body			:	decl functions_list
-			;
+body		:	{SymbolHashStack.newGlobal();} decl {SymbolHashStack.printHash();} functions_list;
 
-decl			:	((string_list decl?) | (variable_list decl?))?
-			;
+decl			:	(string_list+ | variable_list+)*;
+
+
 
 /* Global String Declaration */
 
-string_list		:	'STRING' id ':=' string ';'
-			;
+string_list	:	'STRING' id ':=' string ';' {SymbolHashStack.newSymbol("STRING", $id.text, $string.text);};
 
-string			:	STRINGLITERAL
-			;
+string		:	STRINGLITERAL;
+
+
+
 
 /* Variable Declaration */
 
-variable_list		:	('FLOAT' | 'INT' | 'VOID') id_list ';'
-			;
+variable_list	:	variable_type id_list ';' {SymbolHashStack.newSymbol($variable_type.text, $id_list.text, null);};
 
-id_list			:	id id_tail
-			;
+variable_type	:	('FLOAT' | 'INT' | 'VOID');
 
-id_tail			:	(',' id)*
-			;
+id_list		:	id id_tail;
 
-
-
+id_tail		:	(',' id)*;
 
 
 
@@ -54,31 +51,26 @@ id_tail			:	(',' id)*
 
 /* Functions */
 
-functions_list		:	function_declaration*
-			;
+functions_list	:	function_declaration*;
 
-function_declaration	:	'FUNCTION' ('FLOAT' | 'INT' | 'VOID') id '(' parameters_list? ')' 'BEGIN' function_body 'END'
-			;
+function_declaration	:	'FUNCTION' variable_type id {SymbolHashStack.newFunction($id.text);} '(' parameters_list? ')' 'BEGIN' function_body 'END' {SymbolHashStack.popHash();};
 
-parameters_list		:	('FLOAT' | 'INT' | 'VOID') id p_list_tail
-			;
+parameters_list:	variable_type id p_list_tail {SymbolHashStack.newSymbol($variable_type.text, $id.text, null);};
 
-p_list_tail		:	(',' parameters_list)*
-			;
+p_list_tail		:	(',' parameters_list)*;
 
-function_body		:	statement_list
-			;
+function_body	:	{SymbolHashStack.newFunction();} statement_list;
+
+
 
 
 
 
 /* Statement List */
 
-statement_list		:	statement*
-			;
+statement_list	:	statement*;
 
-statement		:	assignment_s | read_s | write_s | return_s | if_s | do_while_stmt
-			;
+statement	:	assignment_s | read_s | write_s | return_s | if_stmt | do_while_stmt;
 
 
 
@@ -87,66 +79,60 @@ statement		:	assignment_s | read_s | write_s | return_s | if_s | do_while_stmt
 
 /* Basic Statements */
 
-read_s			:	'READ' '(' id_list ')' ';'
-			;
+read_s		:	'READ' '(' id_list ')' ';';
 
-write_s			:	'WRITE' '(' id_list ')' ';'
-			;
+write_s		:	'WRITE' '(' id_list ')' ';';
 
-return_s		:	'RETURN' expression ';'
-			;
+return_s		:	'RETURN' expression ';';
 
-assignment_s		:	id ':=' expression ';'
-			;
+assignment_s	:	id ':=' expression ';';
 
-if_s			:	'IF' (.)*? 'ENDIF'
-			;
-
-
+else_s		:	{SymbolHashStack.newBlock();}  'ELSE' decl {SymbolHashStack.printHash();} {SymbolHashStack.popHash();} statement_list;
 
 
 
 
 /* Expressions */
 
-expression		:	factor expr_tail
-			;	
-expr_tail		:	(addop factor expr_tail)?
-			;	
-factor			:	postfix_expr factor_tail
-			;
-factor_tail		:	(mulop postfix_expr factor_tail)?
-			;
-postfix_expr		:	primary | call_expr
-			;
-call_expr		:	id '(' expr_list? ')'
-			;
-expr_list		:	expression expr_list_tail
-			;
-expr_list_tail		:	(',' expression expr_list_tail)?
-			;
-primary			:	( '('expression')' ) | id | INTLITERAL | FLOATLITERAL 
-			;
-addop			:	'+' | '-'
-			;
-mulop			:	'*' | '/'
-			;
+expression	:	factor expr_tail;	
+
+expr_tail		:	(addop factor expr_tail)?;	
+
+factor		:	postfix_expr factor_tail;
+
+factor_tail	:	(mulop postfix_expr factor_tail)?;
+
+postfix_expr	:	primary | call_expr;
+
+call_expr		:	id '(' expr_list? ')';
+
+expr_list		:	expression expr_list_tail;
+
+expr_list_tail	:	(',' expression expr_list_tail)?;
+
+primary		:	( '('expression')' ) | id | INTLITERAL | FLOATLITERAL;
+
+addop		:	'+' | '-';
+
+mulop		:	'*' | '/';
+
+
 
 
 
 /* Complex Statements & Condition */
 
 
-if_stmt			:	'IF' '(' cond ')' decl? statement_list else_part 'ENDIF'
-			;
-else_part		:	('ELSIF' '(' cond ')' decl? statement_list else_part)?
-			;
-cond			:	( expression compop expression ) | 'TRUE' | 'FALSE'
-			;
-compop			:	'<' | '>' | '=' | '!=' | '<=' | '>='
-			;
-do_while_stmt		:	'DO' decl? statement_list 'WHILE' '(' cond ')'
-			;
+if_stmt		:	{SymbolHashStack.newBlock();} 'IF' '(' cond ')' decl statement_list else_part {SymbolHashStack.printHash();} {SymbolHashStack.popHash();} 'ENDIF';
+
+else_part		:	( {SymbolHashStack.newBlock();} 'ELSIF' '(' cond ')' decl {SymbolHashStack.printHash();} {SymbolHashStack.popHash();} statement_list else_part )?;
+
+cond		:	( expression compop expression ) | 'TRUE' | 'FALSE';
+
+compop		:	'<' | '>' | '=' | '!=' | '<=' | '>=';
+
+do_while_stmt	:	{SymbolHashStack.newBlock();} 'DO' decl {SymbolHashStack.printHash();} statement_list 'WHILE' '(' cond ')' ';' {SymbolHashStack.popHash();};
+
 
 
  
@@ -154,18 +140,18 @@ do_while_stmt		:	'DO' decl? statement_list 'WHILE' '(' cond ')'
  * LEXER RULES
  *------------------------------------------------------------------*/
 
-KEYWORD : ('PROGRAM' | 'BEGIN' | 'STRING' | 'FUNCTION' | 'INT' | 'IF' | 'RETURN' | 'ELSIF' | 'ENDIF' | 'END' | 'VOID' | 'WRITE' | 'DO' | 'WHILE' | 'READ' | 'FLOAT' | 'TRUE');
+KEYWORD 	: ('PROGRAM' | 'BEGIN' | 'STRING' | 'FUNCTION' | 'INT' | 'IF' | 'RETURN' | 'ELSIF' | 'ENDIF' | 'END' | 'VOID' | 'WRITE' | 'DO' | 'WHILE' | 'READ' | 'FLOAT' | 'TRUE');
 
-OPERATOR : (':=' | ';' | '(' | ')' | '>' | '-' | '+' | '=' | ',' | '!=' | '/' | '*' | '<' | '<=');
+OPERATOR 	: (':=' | ';' | '(' | ')' | '>' | '-' | '+' | '=' | ',' | '!=' | '/' | '*' | '<' | '<=');
 
-IDENTIFIER : [a-zA-Z]+[0-9]?;
+IDENTIFIER 	: [a-zA-Z]+[0-9]?;
 
-INTLITERAL : [0-9]+;
+INTLITERAL 	: [0-9]+;
 
-FLOATLITERAL : [0-9]+(.)[0-9]+;
+FLOATLITERAL 	: [0-9]+(.)[0-9]+;
 
-STRINGLITERAL : '"'.*?'"';
+STRINGLITERAL: '"'.*?'"';
 
-WS : [ \t\r\n]+ -> skip;
+WS 			: [ \t\r\n]+ -> skip;
 
-COMMENT : ('--'.*?'\n')  -> skip;
+COMMENT 	: ('--'.*?'\n')  -> skip;

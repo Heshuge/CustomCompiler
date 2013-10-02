@@ -17,10 +17,10 @@ public class Micro{
 		}
 
 		ANTLRFileStream input = new ANTLRFileStream(args[0]);
-		//System.out.println(input);
 		MicroGrammarLexer L1 = new MicroGrammarLexer(input);
 		CommonTokenStream T1 = new CommonTokenStream(L1);
 		MicroGrammarParser P1 = new MicroGrammarParser(T1);
+		CommonTokenStream T2 = new CommonTokenStream(P1);
 
 		try {
 			P1.program();

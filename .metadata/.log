@@ -1,0 +1,15 @@
+!SESSION 2013-10-01 17:03:47.769 -----------------------------------------------
+eclipse.buildId=v22.2.1-833290
+java.version=1.6.0_27
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Framework arguments:  -product com.android.ide.eclipse.adt.package.product
+Command-line arguments:  -data /home/ross/Desktop/rragsdal -os linux -ws gtk -arch x86_64 -product com.android.ide.eclipse.adt.package.product
+
+!ENTRY org.eclipse.ui.ide 4 4 2013-10-01 17:20:48.492
+!MESSAGE Problems saving workspace
+
+!ENTRY org.eclipse.ui.ide 2 1 2013-10-01 17:20:48.494
+!MESSAGE Problems occurred while trying to save the state of the workbench.
+!SUBENTRY 1 org.eclipse.core.resources 2 234 2013-10-01 17:20:48.494
+!MESSAGE The project description file (.project) for 'Compiler' was missing.  This file contains important information about the project.  A new project description file has been created, but some information about the project may have been lost.
