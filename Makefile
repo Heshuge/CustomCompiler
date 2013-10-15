@@ -4,7 +4,7 @@ ANTLR_SCRIPT := MicroGrammar.g
 all: group compiler
 
 group:
-	@echo "rragsdal"
+	@echo "rragsdal imarlowe"
 compiler:
 	rm -rf build
 	mkdir build
@@ -14,5 +14,6 @@ compiler:
 	javac -cp $(LIB_ANTLR) -d classes src/*.java build/*.java
 clean:
 	rm -rf classes build
+
 
 .PHONY: all group compiler clean

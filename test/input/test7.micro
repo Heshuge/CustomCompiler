@@ -24,7 +24,7 @@ BEGIN
 	FUNCTION VOID main ()
 	BEGIN
 		
-    INT i, end, result;
+    	INT i, end, result;
 		READ(end);
 
 	i := 0;

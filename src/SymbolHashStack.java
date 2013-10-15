@@ -9,7 +9,7 @@ public class SymbolHashStack {
 	private static int scope = 1;
 	
 	//***********************
-	//	methods
+	//	methods 
 	//
 	//***********************
 
