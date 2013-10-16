@@ -42,14 +42,28 @@ public class IRNode {
 		return this.result;
 	}
 
-	//prints the IRNode code
-	public void printIRCode() {
+	//stores the result
+	public void storeResult(String result) {
 
-		if(true) {
-			System.out.println("opcode " + this.opcode + " result " + this.result);
-		}
-		else {
-			System.out.println("opcode " + this.opcode + " result " + this.result);
-		}
+		this.result = result;
+	}
+
+	//stores the second_operand
+	public void storeFactor(String opcode, String second_operand) {
+
+		this.opcode = opcode;
+		this.second_operand = second_operand;
+	}
+
+	//prints the IRNode code
+	public void printIRNode() {
+
+		System.out.println("opcode " + this.opcode + " first_operand " + this.first_operand + " second_operand " + this.second_operand + " result " + this.result);
+	}
+	
+	//prints the IRNode updated code
+	public void printIRUpdate() {
+
+		System.out.println("opcode " + this.opcode + " first_operand " + this.first_operand + " second_operand " + this.second_operand + " result " + this.result + " *Assignment");
 	}
 }

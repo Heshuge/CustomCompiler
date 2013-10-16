@@ -64,6 +64,32 @@ public class SymbolHash {
 		}
 	}
 
+	//create new IRNode TAIL
+	public void newIRNodeTail(String opcode, String first_operand) {
+
+		irNodeList.add(new IRNode(opcode, first_operand, "UNDEFINED", "UNDEFINED"));
+		irNodeMap.put(first_operand, opcode);
+		
+	}
+
+	//add factor to second_operand
+	public void addFactor(String opcode, String second_operand) {
+
+		IRNode tempIRNode = irNodeList.get(irNodeList.size()-1);
+		tempIRNode.storeFactor(opcode, second_operand);
+		irNodeList.add(tempIRNode);
+		
+	}
+
+	//add id to result
+	public void addIRId(String result) {
+
+		IRNode tempIRNode = irNodeList.get(irNodeList.size()-1);
+		tempIRNode.storeResult(result);
+		irNodeList.add(tempIRNode);
+		
+	}
+
 	//print the current Hash symbols
 	public void printHashSymbols() {
 
@@ -74,7 +100,26 @@ public class SymbolHash {
 			Symbol tempSymbol = symbolList.get(i);
 			tempSymbol.printOutput();
 		}
+		//loop through indexes
+		for(int i = 0; i < irNodeList.size(); i++) {
+			//check the indexes with the list, and print
+			IRNode tempIRNode = irNodeList.get(i);
+			tempIRNode.printIRNode();
+		}
 		System.out.println();
 	}
 
+	//print IRNode
+	public void printIRNode() {
+
+		IRNode tempIRNode = irNodeList.get(irNodeList.size()-1);
+		tempIRNode.printIRNode();
+	}
+
+	//print IRUpdate
+	public void printIRUpdate() {
+
+		IRNode tempIRNode = irNodeList.get(irNodeList.size()-1);
+		tempIRNode.printIRUpdate();
+	}
 }

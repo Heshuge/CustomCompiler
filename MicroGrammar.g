@@ -86,7 +86,7 @@ write_s			:	'WRITE' '(' id_list ')' ';';
 
 return_s		:	'RETURN' expression ';';
 
-assignment_s	:	id ':=' expression ';';
+assignment_s	:	id ':=' expression ';' {SymbolHashStack.addIRId($id.text);}{SymbolHashStack.printIRNode();};
 
 // Complex Statements
 
@@ -121,19 +121,25 @@ do_while_body	:	decl {SymbolHashStack.printHash();} statement_list 'WHILE' '(' c
 do_while_foot	:	';' {SymbolHashStack.popHash();};
 
 
+
+
+
+
 /* Expressions */
 
 expression		:	factor expr_tail;	
 
 factor			:	postfix_expr factor_tail;
 
-expr_tail		:	(addop factor expr_tail)?;	
+expr_tail		:	(addop factor expr_tail )?;	
 
 postfix_expr	:	primary | call_expr;
 
 factor_tail		:	(mulop postfix_expr factor_tail)?;
 
-primary			:	('('expression')') | id | INTLITERAL | FLOATLITERAL;
+primary			:	('('expression')') | single_id;
+
+single_id		:	(id {SymbolHashStack.newIRNodeTail("s", $id.text);}{SymbolHashStack.printIRNode();}) | (INTLITERAL {SymbolHashStack.newIRNodeTail("s", $INTLITERAL.text);}{SymbolHashStack.printIRNode();}) | (FLOATLITERAL {SymbolHashStack.newIRNodeTail("s", $FLOATLITERAL.text);}{SymbolHashStack.printIRNode();});
 
 call_expr		:	id '(' expr_list? ')';
 

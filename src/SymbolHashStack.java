@@ -39,11 +39,27 @@ public class SymbolHashStack {
 		symbolHashStack.push(tempHash);
 	}
 	
-	//add new IRNode to current stack hash
-	public static void newIRNode(String opcode, String first_operand, String second_operand, String result) {
+	//add new IRNodeTail to current stack hash
+	public static void newIRNodeTail(String opcode, String first_operand) {
 
 		SymbolHash tempHash = symbolHashStack.pop();
-		tempHash.newIRNode(opcode, first_operand, second_operand, result);
+		tempHash.newIRNodeTail(opcode, first_operand);
+		symbolHashStack.push(tempHash);
+	}
+	
+	//add new factor to current IRNode first_op
+	public static void addFactor(String opcode, String second_operand) {
+
+		SymbolHash tempHash = symbolHashStack.pop();
+		tempHash.addFactor(opcode, second_operand);
+		symbolHashStack.push(tempHash);
+	}
+
+	//add new id to current IRNode result
+	public static void addIRId(String result) {
+
+		SymbolHash tempHash = symbolHashStack.pop();
+		tempHash.addIRId(result);
 		symbolHashStack.push(tempHash);
 	}
 	
@@ -54,6 +70,15 @@ public class SymbolHashStack {
 		tempHash.printHashSymbols();
 		symbolHashStack.push(tempHash);
 	}
+	
+	//print IRNode
+	public static void printIRNode() {
+
+		SymbolHash tempHash = symbolHashStack.pop();
+		tempHash.printIRNode();
+		symbolHashStack.push(tempHash);
+	}
+	
 	
 	//pop hash and return to last
 	public static void popHash() {
