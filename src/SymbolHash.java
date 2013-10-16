@@ -8,6 +8,8 @@ public class SymbolHash {
 	//instantiate stack object and scope tracker 
 	private ArrayList<Symbol> symbolList = new ArrayList<Symbol>();
 	private HashMap<String, String> symbolMap = new HashMap<String, String>();
+	private ArrayList<IRNode> irNodeList = new ArrayList<IRNode>();
+	private HashMap<String, String> irNodeMap = new HashMap<String, String>();
 	private String scope; 
 
 	//***********************
@@ -44,6 +46,21 @@ public class SymbolHash {
 				//else throw error
 				System.out.println("DECLARATION ERROR " + name);
 			}
+		}
+	}
+
+	//create new IRNode
+	public void newIRNode(String opcode, String first_operand, String second_operand, String result) {
+
+		//check if its not already in the HashMap
+		if (!symbolMap.containsKey(result)) {
+			//if not, add it
+			irNodeList.add(new IRNode(opcode, first_operand, second_operand, result));
+			irNodeMap.put(result, opcode);
+		}
+		else {
+			//else throw error
+			System.out.println("DECLARATION ERROR " + result);
 		}
 	}
 

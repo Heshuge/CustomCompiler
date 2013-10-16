@@ -125,21 +125,21 @@ do_while_foot	:	';' {SymbolHashStack.popHash();};
 
 expression		:	factor expr_tail;	
 
+factor			:	postfix_expr factor_tail;
+
 expr_tail		:	(addop factor expr_tail)?;	
 
-factor			:	postfix_expr factor_tail;
+postfix_expr	:	primary | call_expr;
 
 factor_tail		:	(mulop postfix_expr factor_tail)?;
 
-postfix_expr	:	primary | call_expr;
+primary			:	('('expression')') | id | INTLITERAL | FLOATLITERAL;
 
 call_expr		:	id '(' expr_list? ')';
 
 expr_list		:	expression expr_list_tail;
 
 expr_list_tail	:	(',' expression expr_list_tail)?;
-
-primary			:	( '('expression')' ) | id | INTLITERAL | FLOATLITERAL;
 
 addop			:	'+' | '-';
 

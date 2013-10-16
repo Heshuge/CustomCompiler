@@ -39,6 +39,14 @@ public class SymbolHashStack {
 		symbolHashStack.push(tempHash);
 	}
 	
+	//add new IRNode to current stack hash
+	public static void newIRNode(String opcode, String first_operand, String second_operand, String result) {
+
+		SymbolHash tempHash = symbolHashStack.pop();
+		tempHash.newIRNode(opcode, first_operand, second_operand, result);
+		symbolHashStack.push(tempHash);
+	}
+	
 	//print hash table
 	public static void printHash() {
 
