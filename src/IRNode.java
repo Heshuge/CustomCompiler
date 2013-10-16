@@ -10,7 +10,7 @@ public class IRNode {
 	//***********************
 
 	//the constructor	
-	public Symbol(String opcode, String first_operand, String second_operand, String result) {
+	public IRNode(String opcode, String first_operand, String second_operand, String result) {
 
 		this.opcode = opcode;
 		this.first_operand = first_operand;
@@ -19,9 +19,9 @@ public class IRNode {
 	}
 	
 	//checks the opcode
-	public String checkName() {
+	public String checkOpcode() {
 
-		return this.name;
+		return this.opcode;
 	}
 
 	//checks the first operand
@@ -45,7 +45,7 @@ public class IRNode {
 	//prints the IRNode code
 	public void printIRCode() {
 
-		if(this.type.equals("STRING")) {
+		if(true) {
 			System.out.println("opcode " + this.opcode + " result " + this.result);
 		}
 		else {
