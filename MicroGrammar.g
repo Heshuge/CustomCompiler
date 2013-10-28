@@ -19,7 +19,7 @@ program			:	'PROGRAM' id 'BEGIN' body 'END' {SymbolHashStack.popHash();};
 
 id				:	IDENTIFIER;
 
-body			:	{SymbolHashStack.newGlobal();} decl {SymbolHashStack.printHash();} functions_list;
+body			:	{SymbolHashStack.newGlobal();} decl {SymbolHashStack.printIRCode();} functions_list {SymbolHashStack.printTinyCode(); ExprStack.printTinyList();};
 
 decl			:	(string_list+ | variable_list+)*;
 
@@ -63,7 +63,7 @@ p_list_tail		:	(',' parameters_list)*;
 
 function_head	:	'FUNCTION' variable_type id {SymbolHashStack.newFunction($id.text);} ;
 
-function_body	:	'(' parameters_list? ')' 'BEGIN' decl {SymbolHashStack.printHash();} statement_list;
+function_body	:	'(' parameters_list? ')' 'BEGIN' decl statement_list;
 
 function_foot	:	'END' {SymbolHashStack.popHash();};
 
@@ -80,13 +80,14 @@ statement		:	assignment_s | read_s | write_s | return_s | if_stmt | do_while_stm
 
 // Basic Statements
 
-read_s			:	'READ' '(' id_list ')' ';';
+assignment_s	:	id ':=' expression {ExprStack.addLIdentifier($id.text); ExprStack.evaluateExpr();} ';';
 
-write_s			:	'WRITE' '(' id_list ')' ';';
+read_s			:	'READ' '(' id_list ')' {ExprStack.evaluateRead($id_list.text);}';';
+
+write_s			:	'WRITE' '(' id_list ')' {ExprStack.evaluateWrite($id_list.text);}';';
 
 return_s		:	'RETURN' expression ';';
 
-assignment_s	:	id ':=' expression ';' {SymbolHashStack.addIRId($id.text);}{SymbolHashStack.printIRNode();};
 
 // Complex Statements
 
@@ -94,15 +95,15 @@ if_stmt			:	if_stmt_head if_stmt_body if_stmt_foot;
 
 // If Statement Format
 
-if_stmt_head	:	'IF' '(' cond ')' {SymbolHashStack.newBlock();} {SymbolHashStack.printHash();};
+if_stmt_head	:	'IF' '(' cond ')' {SymbolHashStack.newBlock();};
 
 if_stmt_body	:	decl statement_list else_if;
 
 if_stmt_foot	:	'ENDIF' {SymbolHashStack.popHash();};
 
-else_if			:	( {SymbolHashStack.newBlock();} 'ELSIF' '(' cond ')' decl {SymbolHashStack.printHash();} {SymbolHashStack.popHash();} statement_list else_if )?;
+else_if			:	( {SymbolHashStack.newBlock();} 'ELSIF' '(' cond ')' decl {SymbolHashStack.popHash();} statement_list else_if )?;
 
-else_s			:	{SymbolHashStack.newBlock();} 'ELSE' decl {SymbolHashStack.printHash();} {SymbolHashStack.popHash();} statement_list;
+else_s			:	{SymbolHashStack.newBlock();} 'ELSE' decl {SymbolHashStack.popHash();} statement_list;
 
 // Conditionals
 
@@ -116,7 +117,7 @@ do_while_stmt	:	do_while_head do_while_body do_while_foot;
 
 do_while_head	:	'DO' {SymbolHashStack.newBlock();};
 
-do_while_body	:	decl {SymbolHashStack.printHash();} statement_list 'WHILE' '(' cond ')';
+do_while_body	:	decl statement_list 'WHILE' '(' cond ')';
 
 do_while_foot	:	';' {SymbolHashStack.popHash();};
 
@@ -131,15 +132,15 @@ expression		:	factor expr_tail;
 
 factor			:	postfix_expr factor_tail;
 
-expr_tail		:	(addop factor expr_tail )?;	
+expr_tail		:	(addop factor {ExprStack.addOperator($addop.text);} expr_tail)?;	
 
 postfix_expr	:	primary | call_expr;
 
-factor_tail		:	(mulop postfix_expr factor_tail)?;
+factor_tail		:	(mulop postfix_expr {ExprStack.addOperator($mulop.text);} factor_tail)?;
 
-primary			:	('('expression')') | single_id;
+primary			:	('('expression')') | (single_id {ExprStack.addRIdentifier($single_id.text);});
 
-single_id		:	(id {SymbolHashStack.newIRNodeTail("s", $id.text);}{SymbolHashStack.printIRNode();}) | (INTLITERAL {SymbolHashStack.newIRNodeTail("s", $INTLITERAL.text);}{SymbolHashStack.printIRNode();}) | (FLOATLITERAL {SymbolHashStack.newIRNodeTail("s", $FLOATLITERAL.text);}{SymbolHashStack.printIRNode();});
+single_id		:	id | INTLITERAL | FLOATLITERAL;
 
 call_expr		:	id '(' expr_list? ')';
 

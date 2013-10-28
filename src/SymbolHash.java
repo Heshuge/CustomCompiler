@@ -49,77 +49,28 @@ public class SymbolHash {
 		}
 	}
 
-	//create new IRNode
-	public void newIRNode(String opcode, String first_operand, String second_operand, String result) {
+	//print the Tiny Code
+	public void printTinyCode() {
 
-		//check if its not already in the HashMap
-		if (!symbolMap.containsKey(result)) {
-			//if not, add it
-			irNodeList.add(new IRNode(opcode, first_operand, second_operand, result));
-			irNodeMap.put(result, opcode);
-		}
-		else {
-			//else throw error
-			System.out.println("DECLARATION ERROR " + result);
-		}
-	}
-
-	//create new IRNode TAIL
-	public void newIRNodeTail(String opcode, String first_operand) {
-
-		irNodeList.add(new IRNode(opcode, first_operand, "UNDEFINED", "UNDEFINED"));
-		irNodeMap.put(first_operand, opcode);
-		
-	}
-
-	//add factor to second_operand
-	public void addFactor(String opcode, String second_operand) {
-
-		IRNode tempIRNode = irNodeList.get(irNodeList.size()-1);
-		tempIRNode.storeFactor(opcode, second_operand);
-		irNodeList.add(tempIRNode);
-		
-	}
-
-	//add id to result
-	public void addIRId(String result) {
-
-		IRNode tempIRNode = irNodeList.get(irNodeList.size()-1);
-		tempIRNode.storeResult(result);
-		irNodeList.add(tempIRNode);
-		
-	}
-
-	//print the current Hash symbols
-	public void printHashSymbols() {
-
-		System.out.println("Symbol table " + scope);
-		//loop through indexes
+		System.out.println(";tiny code");
+		//loop through symbol indexes
 		for(int i = 0; i < symbolList.size(); i++) {
 			//check the indexes with the list, and print
 			Symbol tempSymbol = symbolList.get(i);
-			tempSymbol.printOutput();
+			tempSymbol.printTinyCode();
 		}
-		//loop through indexes
-		for(int i = 0; i < irNodeList.size(); i++) {
-			//check the indexes with the list, and print
-			IRNode tempIRNode = irNodeList.get(i);
-			tempIRNode.printIRNode();
-		}
-		System.out.println();
 	}
 
-	//print IRNode
+	//print IRCode header label for step_4
+	public void printIRCode() {
+		
+		System.out.println(";IR code");
+	}
+	//print IRNode data
 	public void printIRNode() {
 
 		IRNode tempIRNode = irNodeList.get(irNodeList.size()-1);
-		tempIRNode.printIRNode();
+		tempIRNode.printNode();
 	}
 
-	//print IRUpdate
-	public void printIRUpdate() {
-
-		IRNode tempIRNode = irNodeList.get(irNodeList.size()-1);
-		tempIRNode.printIRUpdate();
-	}
 }

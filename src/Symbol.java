@@ -45,4 +45,10 @@ public class Symbol {
 			System.out.println("name " + this.name + " type " + this.type);
 		}
 	}
+	
+	//prints the step_4 tiny code output
+	public void printTinyCode() {
+
+		System.out.println("var " + this.name);
+	}
 }

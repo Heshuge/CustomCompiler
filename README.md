@@ -13,4 +13,5 @@ make all
 
 cd classes
 
-java -cp .:../lib/antlr.jar Micro ../test/input/<testcase.micro> 
+java -cp .:../lib/antlr.jar Micro ../test/input/step4_testcase3.micro
+
