@@ -4,9 +4,14 @@ import java.util.*;
 public class ExprStack {
 
     private static Stack<String> stack = new Stack<String>();
+    private static Stack<String> srstack = new Stack<String>();
 	private static ArrayList<TinyNode> tinylist = new ArrayList<TinyNode>();
     private static int registercount = 1;
     private static int tinyregcount = 1;
+    private static int labelcount = 1;
+    private static int tinylabelcount = 1;
+	private static int breaklabel = 1;
+	private static int dolabel = 1;
 
     public static void addOperator(String op) {
 
@@ -119,6 +124,148 @@ public class ExprStack {
 		//}
     }
 
+	public static void evaluateIf(String cond) {
+
+		String label = newLabel();
+		String t_label = newTinyLabel();
+		String t_SRlabel = newTinySRLabel();
+		
+		String t_res = newTinyReg();
+	
+		String lhe;
+		String rhe;
+
+		//split into left and right hand expressions
+		lhe = cond.split("=")[0];
+		rhe = cond.split("=")[1];
+
+		//push on to subroutine stack
+		//srstack.push(t_SRlabel);
+
+		//add label node
+		IRNode irnode = new IRNode("LABEL", "", "", label);
+		irnode.printNode();
+		TinyNode tnode = new TinyNode("label", "", t_label);
+		tinylist.add(tnode);
+
+		//add mov node(s)
+		TinyNode t1node = new TinyNode("move", rhe, t_res);
+		tinylist.add(t1node);
+
+		//add cmpi node
+		TinyNode t2node = new TinyNode("cmpi", lhe, t_res);
+		tinylist.add(t2node);
+
+		//add jne node
+		TinyNode t3node = new TinyNode("jne", "", "label"+tinylabelcount);
+		tinylist.add(t3node);
+		
+		
+	}
+
+	public static void evaluateElseIf(String cond) {
+
+		String label = newLabel();
+		String t_label = newTinyLabel();
+
+		String t_res = newTinyReg();
+
+		String lhe;
+		String rhe;
+
+		//split into left and right hand expressions
+		lhe = cond.split("=")[0];
+		rhe = cond.split("=")[1];
+
+		//add label node
+		IRNode irnode = new IRNode("LABEL", "", "", label);
+		irnode.printNode();
+		TinyNode tnode = new TinyNode("label", "", t_label);
+		tinylist.add(tnode);
+
+		//add mov node(s)
+		TinyNode t1node = new TinyNode("move", rhe, t_res);
+		tinylist.add(t1node);
+		
+		//add cmpi node
+		TinyNode t2node = new TinyNode("cmpi", lhe, t_res);
+		tinylist.add(t2node);
+
+		//add jne node
+		TinyNode t3node = new TinyNode("jne", "", "label"+tinylabelcount);
+		tinylist.add(t3node);
+		
+	}
+
+	public static void labelDoWhile() {
+
+		String label = newLabel();
+		String t_label = newTinyLabel();
+
+		//add label to global
+		dolabel = tinylabelcount;
+
+		//add label node
+		IRNode irnode = new IRNode("LABEL", "", "", label);
+		irnode.printNode();
+		TinyNode tnode = new TinyNode("label", "", t_label);
+		tinylist.add(tnode);
+
+		
+		
+	}
+
+	public static void evaluateDoWhile(String cond) {
+
+		String t_res = newTinyReg();
+	
+		String lhe;
+		String rhe;
+
+		//split into left and right hand expressions
+		lhe = cond.split("=")[0];
+		rhe = cond.split("=")[1];
+		 
+		//add mov node(s)
+		TinyNode t1node = new TinyNode("move", rhe, t_res);
+		tinylist.add(t1node);
+		
+		//add cmpi node
+		TinyNode t2node = new TinyNode("cmpi", lhe, t_res);
+		tinylist.add(t2node);
+
+		//add jgt node
+		TinyNode t3node = new TinyNode("jgt", "", "label"+breaklabel);
+		tinylist.add(t3node);
+
+		//pop label off srstack
+		//String srlabel = srstack.pop();
+				
+		//add jmp node
+		TinyNode t4node = new TinyNode("jmp", "", "label"+dolabel);
+		tinylist.add(t4node);
+
+		//add label node
+		IRNode irnode = new IRNode("LABEL", "", "", "label"+breaklabel);
+		irnode.printNode();
+		TinyNode tnode = new TinyNode("label", "", "label"+breaklabel);
+		tinylist.add(tnode);
+		
+		
+	}
+
+	public static void breakOut() {	
+		
+		//pop off srstack
+		//String l_id = srstack.pop();
+
+		//add jmp node
+		IRNode irnode = new IRNode("JMP", "", "", "label"+breaklabel);
+		irnode.printNode();
+		TinyNode tnode = new TinyNode("jmp", "", "label"+breaklabel);
+		tinylist.add(tnode);
+	}
+
     public static void addLiteral(String lit) {
 		
 		String op1 = lit;
@@ -174,4 +321,21 @@ public class ExprStack {
 
 		return "r"+Integer.toString((tinyregcount++)-1);
     }
+
+	 public static String newLabel() {
+
+		return "label"+Integer.toString(labelcount++);
+    }
+
+    public static String newTinyLabel() {
+
+		return "label"+Integer.toString(tinylabelcount++);
+    }
+
+	public static String newTinySRLabel() {
+	
+		breaklabel = tinylabelcount;
+		return "label"+Integer.toString(tinylabelcount++);
+    }
+	
 }
