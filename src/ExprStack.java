@@ -170,12 +170,54 @@ public class ExprStack {
 
 		String t_res = newTinyReg();
 
-		String lhe;
-		String rhe;
+		String compop = "";
+			
+		String lhe = "";
+		String rhe = "";
 
-		//split into left and right hand expressions
-		lhe = cond.split("=")[0];
-		rhe = cond.split("=")[1];
+		if (cond.contains("!=")) {
+			
+			//split into left and right hand expressions
+			lhe = cond.split("!=")[0];
+			rhe = cond.split("!=")[1];
+			compop = "jeq";
+			
+		} else if (cond.contains(">=")) {
+
+			//split into left and right hand expressions
+			lhe = cond.split(">=")[0];
+			rhe = cond.split(">=")[1];
+			compop = "jlt";
+
+		} else if (cond.contains("<=")) {
+
+			//split into left and right hand expressions
+			lhe = cond.split("<=")[0];
+			rhe = cond.split("<=")[1];
+			compop = "jgt";
+		
+		} else if (cond.contains(">")) {
+
+			//split into left and right hand expressions
+			lhe = cond.split(">")[0];
+			rhe = cond.split(">")[1];
+			compop = "jgt";
+
+		} else if (cond.contains("<")) {
+	
+			//split into left and right hand expressions
+			lhe = cond.split("<")[0];
+			rhe = cond.split("<")[1];
+			compop = "jlt";
+
+		} else if (cond.contains("=")) {
+
+			//split into left and right hand expressions
+			lhe = cond.split("=")[0];
+			rhe = cond.split("=")[1];
+			compop = "jne";
+
+		}
 
 		//add label node
 		IRNode irnode = new IRNode("LABEL", "", "", label);
@@ -192,7 +234,7 @@ public class ExprStack {
 		tinylist.add(t2node);
 
 		//add jne node
-		TinyNode t3node = new TinyNode("jne", "", "label"+tinylabelcount);
+		TinyNode t3node = new TinyNode(compop, "", "label"+tinylabelcount);
 		tinylist.add(t3node);
 		
 	}
@@ -218,13 +260,55 @@ public class ExprStack {
 	public static void evaluateDoWhile(String cond) {
 
 		String t_res = newTinyReg();
-	
-		String lhe;
-		String rhe;
+		String compop = "";
+			
+		String lhe = "";
+		String rhe = "";
 
-		//split into left and right hand expressions
-		lhe = cond.split("=")[0];
-		rhe = cond.split("=")[1];
+		if (cond.contains("!=")) {
+			
+			//split into left and right hand expressions
+			lhe = cond.split("!=")[0];
+			rhe = cond.split("!=")[1];
+			compop = "jeq";
+			
+		} else if (cond.contains(">=")) {
+
+			//split into left and right hand expressions
+			lhe = cond.split(">=")[0];
+			rhe = cond.split(">=")[1];
+			compop = "jlt";
+
+		} else if (cond.contains("<=")) {
+
+			//split into left and right hand expressions
+			lhe = cond.split("<=")[0];
+			rhe = cond.split("<=")[1];
+			compop = "jgt";
+		
+		} else if (cond.contains(">")) {
+
+			//split into left and right hand expressions
+			lhe = cond.split(">")[0];
+			rhe = cond.split(">")[1];
+			compop = "jgt";
+
+		} else if (cond.contains("<")) {
+	
+			//split into left and right hand expressions
+			lhe = cond.split("<")[0];
+			rhe = cond.split("<")[1];
+			compop = "jlt";
+
+		} else if (cond.contains("=")) {
+
+			//split into left and right hand expressions
+			lhe = cond.split("=")[0];
+			rhe = cond.split("=")[1];
+			compop = "jne";
+
+		}
+		
 		 
 		//add mov node(s)
 		TinyNode t1node = new TinyNode("move", rhe, t_res);
@@ -235,7 +319,7 @@ public class ExprStack {
 		tinylist.add(t2node);
 
 		//add jgt node
-		TinyNode t3node = new TinyNode("jgt", "", "label"+breaklabel);
+		TinyNode t3node = new TinyNode(compop, "", "label"+breaklabel);
 		tinylist.add(t3node);
 
 		//pop label off srstack
