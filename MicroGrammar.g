@@ -36,7 +36,7 @@ string			:	STRINGLITERAL;
 
 /* Variable Declaration */
 
-variable_list	:	variable_type id_list ';' {SymbolHashStack.newSymbol($variable_type.text, $id_list.text, null);};
+variable_list	:	variable_type id_list ';' {SymbolHashStack.newSymbol($variable_type.text, $id_list.text, null); System.out.println($id_list.text);};
 
 variable_type	:	('FLOAT' | 'INT' | 'VOID');
 
@@ -99,7 +99,7 @@ if_stmt_head	:	'IF' '(' cond ')' {SymbolHashStack.newBlock(); ExprStack.evaluate
 
 if_stmt_body	:	decl statement_list {ExprStack.breakOut();} else_if;
 
-if_stmt_foot	:	'ENDIF' {SymbolHashStack.popHash();};
+if_stmt_foot	:	'ENDIF' {ExprStack.labelEndIf(); SymbolHashStack.popHash();};
 
 else_if			:	( {SymbolHashStack.newBlock();} 'ELSIF' '(' cond ')' {ExprStack.evaluateElseIf($cond.text);} decl {SymbolHashStack.popHash();} statement_list {ExprStack.breakOut();} else_if )?;
 
