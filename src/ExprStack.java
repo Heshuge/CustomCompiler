@@ -8,6 +8,8 @@ public class ExprStack {
 	//if and dowhile jump logic
     private static Stack<String> labelstack = new Stack<String>();
     private static Stack<String> dowhilestack = new Stack<String>();
+	//function stack
+	private static Stack<String> functionstack = new Stack<String>();
 	//tiny node list
 	private static ArrayList<TinyNode> tinylist = new ArrayList<TinyNode>();
 	//counters
@@ -17,9 +19,47 @@ public class ExprStack {
     private static int tinylabelcount = 1;
 	private static int breaklabel = 1;
 	private static int dolabel = 1;
+	//if and dowhile labels
 	private static String endiflabel = "";
 	private static String dowhilelabel = "";
 
+	////////////////////////
+	//
+	//	functionPush
+	//
+	//
+	////////////////////////
+	public static void functionPush(String id, String parameters_list) {
+	
+		functionstack.push("return_value");
+		functionstack.push(parameters_list);
+		TinyNode tnode1 = new TinyNode("jmp ", "", "main");		
+		tinylist.add(tnode1);		
+		//TinyNode tnode = new TinyNode("jsr", "", id); this goes when the function is called
+		TinyNode tnode2 = new TinyNode("label ", "", id);		
+		tinylist.add(tnode2);
+	}
+
+	////////////////////////
+	//
+	//	functionPop
+	//
+	//
+	////////////////////////
+	public static void functionPop() {
+	
+		functionstack.pop();
+		String return_value = functionstack.pop();
+		TinyNode tnode = new TinyNode("ret", "", "");		
+		tinylist.add(tnode);
+	}
+
+	////////////////////////
+	//
+	//	addOperator
+	//
+	//
+	////////////////////////
     public static void addOperator(String op) {
 
 		String res = newRegister();

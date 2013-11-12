@@ -36,7 +36,7 @@ string			:	STRINGLITERAL;
 
 /* Variable Declaration */
 
-variable_list	:	variable_type id_list ';' {SymbolHashStack.newSymbol($variable_type.text, $id_list.text, null); System.out.println($id_list.text);};
+variable_list	:	variable_type id_list ';' {SymbolHashStack.newSymbol($variable_type.text, $id_list.text, null); };
 
 variable_type	:	('FLOAT' | 'INT' | 'VOID');
 
@@ -61,11 +61,11 @@ p_list_tail		:	(',' parameters_list)*;
 
 // Function Format 
 
-function_head	:	'FUNCTION' variable_type id {SymbolHashStack.newFunction($id.text);} ;
+function_head	:	'FUNCTION' variable_type id {SymbolHashStack.newFunction($id.text);} '(' parameters_list? ')'{ExprStack.functionPush($id.text, $parameters_list.text);};
 
-function_body	:	'(' parameters_list? ')' 'BEGIN' decl statement_list;
+function_body	:	'BEGIN' decl statement_list;
 
-function_foot	:	'END' {SymbolHashStack.popHash();};
+function_foot	:	'END' {SymbolHashStack.popHash(); ExprStack.functionPop();};
 
 
 
