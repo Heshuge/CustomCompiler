@@ -3,12 +3,14 @@ import java.util.*;
 
 public class ExprStack {
 
+	//call stack
     private static Stack<String> stack = new Stack<String>();
-	
+	//if and dowhile jump logic
     private static Stack<String> labelstack = new Stack<String>();
     private static Stack<String> dowhilestack = new Stack<String>();
-
+	//tiny node list
 	private static ArrayList<TinyNode> tinylist = new ArrayList<TinyNode>();
+	//counters
     private static int registercount = 1;
     private static int tinyregcount = 1;
     private static int labelcount = 1;
