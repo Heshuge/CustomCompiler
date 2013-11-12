@@ -97,11 +97,11 @@ if_stmt			:	if_stmt_head if_stmt_body if_stmt_foot;
 
 if_stmt_head	:	'IF' '(' cond ')' {SymbolHashStack.newBlock(); ExprStack.evaluateIf($cond.text);};
 
-if_stmt_body	:	decl statement_list {ExprStack.breakOut();} else_if;
+if_stmt_body	:	decl statement_list else_if;
 
 if_stmt_foot	:	'ENDIF' {ExprStack.labelEndIf(); SymbolHashStack.popHash();};
 
-else_if			:	( {SymbolHashStack.newBlock();} 'ELSIF' '(' cond ')' {ExprStack.evaluateElseIf($cond.text);} decl {SymbolHashStack.popHash();} statement_list {ExprStack.breakOut();} else_if )?;
+else_if			:	( {SymbolHashStack.newBlock();} 'ELSIF' '(' cond ')' {ExprStack.evaluateElseIf($cond.text);} decl {SymbolHashStack.popHash();} statement_list else_if )?;
 
 else_s			:	{SymbolHashStack.newBlock();} 'ELSE' decl {SymbolHashStack.popHash();} statement_list;
 

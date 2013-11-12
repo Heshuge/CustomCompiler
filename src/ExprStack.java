@@ -4,7 +4,10 @@ import java.util.*;
 public class ExprStack {
 
     private static Stack<String> stack = new Stack<String>();
-    private static Stack<String> srstack = new Stack<String>();
+	
+    private static Stack<String> labelstack = new Stack<String>();
+    private static Stack<String> dowhilestack = new Stack<String>();
+
 	private static ArrayList<TinyNode> tinylist = new ArrayList<TinyNode>();
     private static int registercount = 1;
     private static int tinyregcount = 1;
@@ -13,6 +16,7 @@ public class ExprStack {
 	private static int breaklabel = 1;
 	private static int dolabel = 1;
 	private static String endiflabel = "";
+	private static String dowhilelabel = "";
 
     public static void addOperator(String op) {
 
@@ -186,13 +190,13 @@ public class ExprStack {
 
 		}
 
-		//push on to subroutine stack
-		//srstack.push(t_SRlabel);
+		//push if-statement label onto stack
+		
 
 		//add label node for endif
 		TinyNode tnode = new TinyNode("label", "", t_label);
-		endiflabel = t_label;
-		tinylist.add(tnode);
+		labelstack.push(t_label);
+		//tinylist.add(tnode);
 
 		//add mov node(s)
 		TinyNode t1node = new TinyNode("move", rhe, t_res);
@@ -220,6 +224,15 @@ public class ExprStack {
 			
 		String lhe = "";
 		String rhe = "";
+
+		
+		endiflabel = labelstack.pop();
+		
+		labelstack.push(endiflabel);
+
+		TinyNode tnode0 = new TinyNode("jmp", "", endiflabel);
+		tinylist.add(tnode0);
+
 
 		if (cond.contains("TRUE")) {
 			lhe = "0";
@@ -295,12 +308,16 @@ public class ExprStack {
 		
 		String label = newLabel();
 		String t_label = newTinyLabel();
+		
+		endiflabel = labelstack.pop();
 
 		//add label node
 		IRNode irnode = new IRNode("LABEL", "", "", label);
 		irnode.printNode();
-		TinyNode tnode = new TinyNode("label", "", "label"+breaklabel);
-		tinylist.add(tnode);
+		TinyNode tnode1 = new TinyNode("label", "", t_label);
+		tinylist.add(tnode1);
+		TinyNode tnode2 = new TinyNode("label", "", endiflabel);
+		tinylist.add(tnode2);
 
 	}
 
@@ -309,8 +326,8 @@ public class ExprStack {
 		String label = newLabel();
 		String t_label = newTinyLabel();
 
-		//add label to global
-		dolabel = tinylabelcount;
+		//add dowhile label to stack
+		dowhilestack.push(t_label);
 
 		//add label node
 		IRNode irnode = new IRNode("LABEL", "", "", label);
@@ -329,49 +346,54 @@ public class ExprStack {
 			
 		String lhe = "";
 		String rhe = "";
+		
+		dowhilelabel = dowhilestack.pop();
+		
 
+
+		//dowhile equalities work in the intuitive way
 
 		if (cond.contains("!=")) {
 			
 			//split into left and right hand expressions
 			lhe = cond.split("!=")[0];
 			rhe = cond.split("!=")[1];
-			compop = "jeq";
+			compop = "jne";
 			
 		} else if (cond.contains(">=")) {
 
 			//split into left and right hand expressions
-			lhe = cond.split(">=")[1];
-			rhe = cond.split(">=")[0];
-			compop = "jlt";
+			lhe = cond.split(">=")[0];
+			rhe = cond.split(">=")[1];
+			compop = "jgt";
 
 		} else if (cond.contains("<=")) {
 
 			//split into left and right hand expressions
 			lhe = cond.split("<=")[0];
 			rhe = cond.split("<=")[1];
-			compop = "jgt";
+			compop = "jlt";
 		
 		} else if (cond.contains(">")) {
 
 			//split into left and right hand expressions
 			lhe = cond.split(">")[0];
 			rhe = cond.split(">")[1];
-			compop = "jlt";
+			compop = "jgt";
 
 		} else if (cond.contains("<")) {
 	
 			//split into left and right hand expressions
 			lhe = cond.split("<")[0];
 			rhe = cond.split("<")[1];
-			compop = "jgt";
+			compop = "jlt";
 
 		} else if (cond.contains("=")) {
 
 			//split into left and right hand expressions
 			lhe = cond.split("=")[0];
 			rhe = cond.split("=")[1];
-			compop = "jne";
+			compop = "jeq";
 
 		}
 
@@ -384,29 +406,25 @@ public class ExprStack {
 		tinylist.add(t2node);
 
 		//add jump node
-		TinyNode t3node = new TinyNode(compop, "", "label"+breaklabel);
+		TinyNode t3node = new TinyNode(compop, "", dowhilelabel);
 		tinylist.add(t3node);
 
-		//pop label off srstack
-		//String srlabel = srstack.pop();
 				
 		//add jmp node
-		TinyNode t4node = new TinyNode("jmp", "", "label"+dolabel);
-		tinylist.add(t4node);
+		//TinyNode t4node = new TinyNode("jmp", "", "label"+dolabel);
+		//tinylist.add(t4node);
 
 		//add label node
-		IRNode irnode = new IRNode("LABEL", "", "", "label"+breaklabel);
-		irnode.printNode();
-		TinyNode tnode = new TinyNode("label", "", "label"+breaklabel);
-		tinylist.add(tnode);
+		//IRNode irnode = new IRNode("LABEL", "", "", dowhilelabel);
+		//irnode.printNode();
+		//TinyNode tnode = new TinyNode("label", "", dowhilelabel);
+		//tinylist.add(tnode);
 		
 		
 	}
 
 	public static void breakOut() {	
 		
-		//pop off srstack
-		//String l_id = srstack.pop();
 
 		//add jmp node
 		IRNode irnode = new IRNode("JMP", "", "", "label"+breaklabel);

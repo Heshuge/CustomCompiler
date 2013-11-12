@@ -1,0 +1,21 @@
+PROGRAM test
+BEGIN
+
+	INT i, j;
+
+	FUNCTION VOID main()
+	BEGIN
+	
+		i := 0;
+		j := 0;
+	
+        DO
+			i:=i+1;
+			DO
+				j:=j+1;
+			WHILE (j < 5);
+		WHILE (i <10);
+
+		WRITE(k);
+	END
+END
