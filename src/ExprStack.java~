@@ -423,6 +423,15 @@ public class ExprStack {
 		
 	}
 
+	public static void breakOut() {	
+		
+
+		//add jmp node
+		IRNode irnode = new IRNode("JMP", "", "", "label"+breaklabel);
+		irnode.printNode();
+		TinyNode tnode = new TinyNode("jmp", "", "label"+breaklabel);
+		tinylist.add(tnode);
+	}
 
     public static void addLiteral(String lit) {
 		
