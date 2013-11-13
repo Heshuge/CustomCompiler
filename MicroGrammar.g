@@ -15,11 +15,11 @@ grammar MicroGrammar;
 
 /* Program */
 
-program			:	'PROGRAM' id 'BEGIN' body 'END' {SymbolHashStack.popHash();};
+program			:	'PROGRAM' id 'BEGIN' {SymbolHashStack.newGlobal(); ExprStack.globalPush();} body 'END' {SymbolHashStack.popHash();};
 
 id				:	IDENTIFIER;
 
-body			:	{SymbolHashStack.newGlobal();} decl {SymbolHashStack.printIRCode();} functions_list {SymbolHashStack.printTinyCode(); ExprStack.printTinyList();};
+body			:	decl {SymbolHashStack.printIRCode();} functions_list {SymbolHashStack.printTinyCode(); ExprStack.printTinyList();};
 
 decl			:	(string_list+ | variable_list+)*;
 
@@ -61,11 +61,11 @@ p_list_tail		:	(',' parameters_list)*;
 
 // Function Format 
 
-function_head	:	'FUNCTION' variable_type id {SymbolHashStack.newFunction($id.text);} '(' parameters_list? ')'{ExprStack.functionPush($id.text, $parameters_list.text);};
+function_head	:	'FUNCTION' variable_type id {SymbolHashStack.newFunction($id.text);} '(' parameters_list? ')'{ExprStack.functionLabel($id.text, $parameters_list.text);};
 
 function_body	:	'BEGIN' decl statement_list;
 
-function_foot	:	'END' {SymbolHashStack.popHash(); ExprStack.functionPop();};
+function_foot	:	'END' {SymbolHashStack.popHash(); ExprStack.functionReturn();};
 
 
 
@@ -76,17 +76,19 @@ function_foot	:	'END' {SymbolHashStack.popHash(); ExprStack.functionPop();};
 
 statement_list	:	statement* ;
 
-statement		:	assignment_s | read_s | write_s | return_s | if_stmt | do_while_stmt ;
+statement		:	assignment_s | function_s | read_s | write_s | return_s | if_stmt | do_while_stmt ;
 
 // Basic Statements
 
 assignment_s	:	id ':=' expression {ExprStack.addLIdentifier($id.text); ExprStack.evaluateExpr();} ';';
 
-read_s			:	'READ' '(' id_list ')' {ExprStack.evaluateRead($id_list.text);}';';
+read_s			:	'READ' '(' id_list ')' {ExprStack.evaluateRead($id_list.text, SymbolHashStack.checkType($id_list.text));}';';
 
-write_s			:	'WRITE' '(' id_list ')' {ExprStack.evaluateWrite($id_list.text);}';';
+write_s			:	'WRITE' '(' id_list ')' {ExprStack.evaluateWrite($id_list.text, SymbolHashStack.checkType($id_list.text));}';';
 
-return_s		:	'RETURN' expression ';';
+function_s		:	id '(' id_list ')' {ExprStack.functionPush($id.text, $id_list.text);}';';
+
+return_s		:	'RETURN' expression {ExprStack.functionPop($expression.text);}';';
 
 
 // Complex Statements

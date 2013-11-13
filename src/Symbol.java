@@ -35,7 +35,7 @@ public class Symbol {
 		return this.value;
 	}
 	
-	//prints the step_3 symbol output
+	//prints a debugging symbol output
 	public void printOutput() {
 
 		if(this.type.equals("STRING")) {
@@ -46,9 +46,14 @@ public class Symbol {
 		}
 	}
 	
-	//prints the step_4 tiny code output
+	//prints the global declaration output
 	public void printTinyCode() {
 
-		System.out.println("var " + this.name);
+		if(this.type.equals("STRING")) {
+			System.out.println("str " + this.name + " " + this.value);
+		}
+		else {
+			System.out.println("var " + this.name);
+		}
 	}
 }

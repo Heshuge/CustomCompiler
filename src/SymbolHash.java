@@ -48,10 +48,16 @@ public class SymbolHash {
 			}
 		}
 	}
+	
+	public String checkType(String name) {
+
+		return symbolMap.get(name);	
+	}
 
 	//print the Tiny Code
 	public void printTinyCode() {
-
+	
+		System.out.println();
 		System.out.println(";tiny code");
 		//loop through symbol indexes
 		for(int i = 0; i < symbolList.size(); i++) {

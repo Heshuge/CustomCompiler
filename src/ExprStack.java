@@ -17,11 +17,60 @@ public class ExprStack {
     private static int tinyregcount = 1;
     private static int labelcount = 1;
     private static int tinylabelcount = 1;
-	private static int breaklabel = 1;
-	private static int dolabel = 1;
 	//if and dowhile labels
 	private static String endiflabel = "";
 	private static String dowhilelabel = "";
+
+	////////////////////////
+	//
+	//	globalPush
+	//
+	//
+	////////////////////////
+	public static void globalPush() {
+	
+		functionstack.push("");
+		functionstack.push("");
+		functionstack.push("");
+		functionstack.push("");
+		functionstack.push("");
+		functionstack.push("");
+		functionstack.push("");
+		functionstack.push("");
+		functionstack.push("");
+		functionstack.push("");
+	}
+	
+	////////////////////////
+	//
+	//	functionLabel
+	//
+	//
+	////////////////////////
+	public static void functionLabel(String id, String parameters_list) {
+	
+		//IR
+		IRNode irnode = new IRNode("FUNCTION", id, "", parameters_list);
+		irnode.printNode();
+		
+		//Tiny
+		TinyNode tnode1 = new TinyNode("jmp ", "", "main");		
+		tinylist.add(tnode1);		
+		TinyNode tnode2 = new TinyNode("label ", "", id);		
+		tinylist.add(tnode2);
+	}
+
+	////////////////////////
+	//
+	//	functionReturn
+	//
+	//
+	////////////////////////
+	public static void functionReturn() {
+	
+		TinyNode tnode = new TinyNode("ret", "", "");		
+		tinylist.add(tnode);
+	}
 
 	////////////////////////
 	//
@@ -29,15 +78,16 @@ public class ExprStack {
 	//
 	//
 	////////////////////////
-	public static void functionPush(String id, String parameters_list) {
+	public static void functionPush(String id, String id_list) {
 	
-		functionstack.push("return_value");
-		functionstack.push(parameters_list);
-		TinyNode tnode1 = new TinyNode("jmp ", "", "main");		
-		tinylist.add(tnode1);		
-		//TinyNode tnode = new TinyNode("jsr", "", id); this goes when the function is called
-		TinyNode tnode2 = new TinyNode("label ", "", id);		
+		functionstack.push("");
+		TinyNode tnode1 = new TinyNode("push", "", "");
+		tinylist.add(tnode1);
+		functionstack.push(id_list);
+		TinyNode tnode2 = new TinyNode("push", "", id_list);
 		tinylist.add(tnode2);
+		TinyNode tnode3 = new TinyNode("jsr", "", id);
+		tinylist.add(tnode3);
 	}
 
 	////////////////////////
@@ -46,12 +96,14 @@ public class ExprStack {
 	//
 	//
 	////////////////////////
-	public static void functionPop() {
+	public static void functionPop(String ret) {
 	
 		functionstack.pop();
-		String return_value = functionstack.pop();
-		TinyNode tnode = new TinyNode("ret", "", "");		
-		tinylist.add(tnode);
+		TinyNode tnode1 = new TinyNode("pop", "", "");		
+		tinylist.add(tnode1);
+		ret = functionstack.pop();
+		TinyNode tnode2 = new TinyNode("pop", "", ret);		
+		tinylist.add(tnode2);
 	}
 
 	////////////////////////
@@ -64,10 +116,11 @@ public class ExprStack {
 
 		String res = newRegister();
 		String t_res = newTinyReg();
+
 		String op2 = stack.pop();
 		String op1 = stack.pop();
-		String t_op = "";
 		stack.push(res);
+
 		String optype = "I";
 		String tiny_ot = "i";
 		String instruction = "";
@@ -111,6 +164,8 @@ public class ExprStack {
 			tiny_instr	= "div"; 
 		}	
 
+		
+
 		IRNode irnode = new IRNode(instruction+optype, op1, op2, res);
 		irnode.printNode();
 		TinyNode t1node = new TinyNode("move", op1, t_res);
@@ -121,6 +176,12 @@ public class ExprStack {
 		//t2node.printNode();
     }
 
+	////////////////////////
+	//
+	//	evaluateExpr
+	//
+	//
+	////////////////////////
     public static void evaluateExpr() {
 
 		String res = stack.pop();
@@ -141,36 +202,41 @@ public class ExprStack {
 		//tnode.printNode();
     }
 
-	public static void evaluateWrite(String id_list) {
+	////////////////////////
+	//
+	//	evaluateWrite
+	//
+	//
+	////////////////////////
+	public static void evaluateWrite(String id_list, String type) {
 
-		String optype = "I";
-		//split id_list args
-		//String[] id_array = id_list.split(",");
-		//loop through id_array 
-		//for (int i = 0; i < id_list.length; i++) {
-		IRNode irnode = new IRNode("WRITE"+optype, "", "", id_list);
+		IRNode irnode = new IRNode("WRITE"+type, "", "", id_list);
 		irnode.printNode();
-		TinyNode tnode = new TinyNode("sys", "writei", id_list);
+		TinyNode tnode = new TinyNode("sys", "write", id_list);
 		tinylist.add(tnode);		
-		//tnode.printNode();
-		//}
+
     }
 	
-	public static void evaluateRead(String id_list) {
+	////////////////////////
+	//
+	//	evaluateRead
+	//
+	//
+	////////////////////////
+	public static void evaluateRead(String id_list, String type) {
 
-		String optype = "I";
-		//split id_list args
-		//String[] id_array = id_list.split(",");
-		//loop through id_array 
-		//for (int i = 0; i < id_list.length; i++) {
-		IRNode irnode = new IRNode("READ"+optype, "", "", id_list);
+		IRNode irnode = new IRNode("READ"+type, "", "", id_list);
 		irnode.printNode();
-		TinyNode tnode = new TinyNode("sys", "readi", id_list);
+		TinyNode tnode = new TinyNode("sys", "read", id_list);
 		tinylist.add(tnode);		
-		//tnode.printNode();
-		//}
     }
 
+	////////////////////////
+	//
+	//	evaluateIf
+	//
+	//
+	////////////////////////
 	public static void evaluateIf(String cond) {
 
 		String label = newLabel();
@@ -255,6 +321,12 @@ public class ExprStack {
 		
 	}
 
+	////////////////////////
+	//
+	//	evaluateElseIf
+	//
+	//
+	////////////////////////
 	public static void evaluateElseIf(String cond) {
 
 		String label = newLabel();
@@ -346,6 +418,12 @@ public class ExprStack {
 		
 	}
 
+	////////////////////////
+	//
+	//	labelEndIf
+	//
+	//
+	////////////////////////
 	public static void labelEndIf() {
 		
 		String label = newLabel();
@@ -363,6 +441,12 @@ public class ExprStack {
 
 	}
 
+	////////////////////////
+	//
+	//	labelDoWhile
+	//
+	//
+	////////////////////////
 	public static void labelDoWhile() {
 
 		String label = newLabel();
@@ -381,6 +465,12 @@ public class ExprStack {
 		
 	}
 
+	////////////////////////
+	//
+	//	evaluateDoWhile
+	//
+	//
+	////////////////////////
 	public static void evaluateDoWhile(String cond) {
 
 		String t_res = newTinyReg();
@@ -450,22 +540,16 @@ public class ExprStack {
 		//add jump node
 		TinyNode t3node = new TinyNode(compop, "", dowhilelabel);
 		tinylist.add(t3node);
-
-				
-		//add jmp node
-		//TinyNode t4node = new TinyNode("jmp", "", "label"+dolabel);
-		//tinylist.add(t4node);
-
-		//add label node
-		//IRNode irnode = new IRNode("LABEL", "", "", dowhilelabel);
-		//irnode.printNode();
-		//TinyNode tnode = new TinyNode("label", "", dowhilelabel);
-		//tinylist.add(tnode);
 		
 		
 	}
 
-
+	////////////////////////
+	//
+	//	addLiteral
+	//
+	//
+	////////////////////////
     public static void addLiteral(String lit) {
 		
 		String op1 = lit;
@@ -491,6 +575,12 @@ public class ExprStack {
 		stack.push(res);
     }
 	
+	////////////////////////
+	//
+	//	printTinyList
+	//
+	//
+	////////////////////////
 	public static void printTinyList(){
 
 		for (int i = 0; i < tinylist.size(); i++) {
@@ -502,39 +592,69 @@ public class ExprStack {
 		System.out.println("sys halt");
     }
 
+	////////////////////////
+	//
+	//	addRIdentifier
+	//
+	//
+	////////////////////////
     public static void addRIdentifier(String id) {
 		
 		stack.push(id);
     }
 
+	////////////////////////
+	//
+	//	addLIdentifier
+	//
+	//
+	////////////////////////
     public static void addLIdentifier(String id) {
 		
 		stack.push(id);
     }
 
+	////////////////////////
+	//
+	//	newRegister
+	//
+	//
+	////////////////////////
     public static String newRegister() {
 
 		return "$T"+Integer.toString(registercount++);
     }
 
+	////////////////////////
+	//
+	//	newTinyReg
+	//
+	//
+	////////////////////////
     public static String newTinyReg() {
 
 		return "r"+Integer.toString((tinyregcount++)-1);
     }
 
+	////////////////////////
+	//
+	//	newLabel
+	//
+	//
+	////////////////////////
 	 public static String newLabel() {
 
 		return "label"+Integer.toString(labelcount++);
     }
 
+	////////////////////////
+	//
+	//	newTinyLabel
+	//
+	//
+	////////////////////////
     public static String newTinyLabel() {
 
-		return "label"+Integer.toString(tinylabelcount++);
-    }
-
-	public static String newTinySRLabel() {
-	
-		breaklabel = tinylabelcount;
 		return "label"+Integer.toString(tinylabelcount++);
     }
 	

@@ -60,4 +60,14 @@ public class SymbolHashStack {
 
 		SymbolHash tempHash = symbolHashStack.pop();
 	}
+	
+	//check id's type
+	public static String checkType(String name) {
+		
+		SymbolHash tempHash = symbolHashStack.pop();
+		String type = tempHash.checkType(name);
+		symbolHashStack.push(tempHash);
+
+		return type;
+	}
 }
