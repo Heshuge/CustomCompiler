@@ -55,7 +55,7 @@ public class SymbolHash {
 			return symbolMap.get(name);
 		}
 		//else throw error
-		System.out.println(";ERROR: TYPE NOT FOUND IN SCOPE: " + checkScope());
+		//System.out.println(";ERROR: " + name + " TYPE NOT FOUND IN SCOPE: " + checkScope());
 		return "E";
 	}
 

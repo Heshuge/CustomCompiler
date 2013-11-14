@@ -67,8 +67,9 @@ public class SymbolHashStack {
 	public static String checkGlobal(String name) {
 
 		String type = "";
+		String[] names;	
+		names = name.split(",");
 		SymbolHash tempHash = symbolHashStack.pop();
-		System.out.println(";Stack handling: " + tempHash.checkScope());
 		symbolHashStackHandler.push(tempHash);
 		globaltraversaltracker++;
 		while (tempHash.checkScope().contains("GLOBAL")!=true) {
@@ -78,9 +79,13 @@ public class SymbolHashStack {
 			symbolHashStackHandler.push(tempHash);
 			globaltraversaltracker++;
 		}
+		for (int j=0;j<names.length;j++) {
+			System.out.println(names[j]);
+			type = tempHash.checkType(names[j]);
+			System.out.println(type);
+		}
 		for (int i=0; i < globaltraversaltracker; globaltraversaltracker--) {
-	
-			type = tempHash.checkType(name);
+		
 			tempHash = symbolHashStackHandler.pop();
 			System.out.println(";Stack handling: " + tempHash.checkScope());
 			symbolHashStack.push(tempHash);
@@ -91,10 +96,17 @@ public class SymbolHashStack {
 	//check id's type
 	public static String checkType(String name) {
 				
-		String type;
+		//splitArgs		
+		String type = "";
+		String[] names;
+		names = name.split(",");
 		SymbolHash tempHash = symbolHashStack.pop();
-		type = tempHash.checkType(name);
-		symbolHashStack.push(tempHash);
+		for (int i=0;i<names.length;i++) {
+			System.out.println(names[i]);
+			type = tempHash.checkType(names[i]);
+			System.out.println(type);
+			symbolHashStack.push(tempHash);
+		}
 		if (type == "E") {
 			type = checkGlobal(name);
 		}

@@ -287,26 +287,28 @@ public class ExprStack {
 	//
 	//
 	////////////////////////
-	public static void evaluateWrite(String id_list, String type) {
+	public static void evaluateWrite(String id_list, String type) { //need to change back to only id_list input
 
-		//if (id_list.contains(",")) {
-			//String[] ids = id_list.split(",");
-			//for (int i = 0; i < id_list.length(); i++) {
-				//IR
-				//IRNode irnode = new IRNode("WRITE"+type, "", "", ids[i]);
-				//irnode.printNode();
-				//Tiny
-				//TinyNode tnode = new TinyNode("sys", "write"+type, ids[i]);
-				//tinylist.add(tnode);
-			//}
-		//} else {
-			//IR
-			IRNode irnode = new IRNode("WRITE"+type, "", "", id_list);
+		String l_type = "";
+		//loop through args
+		String[] ids = id_list.split(",");
+		for (int i=0;i<ids.length;i++) {
+			//find type
+			if (type.contains("STRING")) {
+				l_type = "s";
+			}
+			if (type.contains("INT")) {
+				l_type = "i";
+			}
+			if (type.contains("FLOAT")) {
+				l_type = "r";
+			}
+			//create node
+			IRNode irnode = new IRNode("WRITE"+l_type, "", "", ids[i]);
 			irnode.printNode();
-			//Tiny
-			TinyNode tnode = new TinyNode("sys", "write"+type, id_list);
-			tinylist.add(tnode);	
-		//}	
+			TinyNode tnode = new TinyNode("sys", "write"+l_type, ids[i]);
+			tinylist.add(tnode);
+		}		
     }
 	
 	////////////////////////
@@ -317,10 +319,26 @@ public class ExprStack {
 	////////////////////////
 	public static void evaluateRead(String id_list, String type) {
 
-		IRNode irnode = new IRNode("READ"+type, "", "", id_list);
-		irnode.printNode();
-		TinyNode tnode = new TinyNode("sys", "read", id_list);
-		tinylist.add(tnode);		
+		String l_type = "";
+		//loop through args
+		String[] ids = id_list.split(",");
+		for (int i=0;i<ids.length;i++) {
+			//find type
+			if (type.contains("STRING")) {
+				l_type = "s";
+			}
+			if (type.contains("INT")) {
+				l_type = "i";
+			}
+			if (type.contains("FLOAT")) {
+				l_type = "r";
+			}
+			//create node
+			IRNode irnode = new IRNode("READ"+l_type, "", "", ids[i]);
+			irnode.printNode();
+			TinyNode tnode = new TinyNode("sys", "read"+l_type, ids[i]);
+			tinylist.add(tnode);
+		}		
     }
 
 	////////////////////////
