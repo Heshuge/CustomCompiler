@@ -142,7 +142,7 @@ primary			:	('('expression')') | (single_id {ExprStack.addRIdentifier($single_id
 
 single_id		:	id | INTLITERAL | FLOATLITERAL;
 
-call_expr		:	id '(' expr_list? ')' {ExprStack.functionCall($id.text);};
+call_expr		:	id {ExprStack.functionRP();} '(' expr_list? ')' {ExprStack.functionCall($id.text);};
 
 expr_list		:	expression expr_list_tail {ExprStack.functionPush($expression.text);};
 

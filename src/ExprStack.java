@@ -3,7 +3,7 @@ import java.util.*;
 
 public class ExprStack {
 
-	//call stack
+	//variable name stack
     private static Stack<String> stack = new Stack<String>();
 	//if and dowhile jump logic
     private static Stack<String> labelstack = new Stack<String>();
@@ -17,6 +17,7 @@ public class ExprStack {
     private static int tinyregcount = 1;
     private static int labelcount = 1;
     private static int tinylabelcount = 1;
+	private static int argcounter = 0;
 	//if and dowhile labels
 	private static String endiflabel = "";
 	private static String dowhilelabel = "";
@@ -89,13 +90,23 @@ public class ExprStack {
 	////////////////////////
 	public static void functionPush(String expression) {
 	
-		
-		functionstack.push("");
-		TinyNode tnode1 = new TinyNode("push", "", "");
-		tinylist.add(tnode1);
 		functionstack.push(expression);
 		TinyNode tnode2 = new TinyNode("push", "", expression);
 		tinylist.add(tnode2);
+		argcounter++;
+	}
+
+	////////////////////////
+	//
+	//	functionRP
+	//
+	//
+	////////////////////////
+	public static void functionRP() {
+	
+		functionstack.push("");
+		TinyNode tnode = new TinyNode("push", "", "");
+		tinylist.add(tnode);
 	}
 	
 	////////////////////////
@@ -106,8 +117,42 @@ public class ExprStack {
 	////////////////////////
 	public static void functionCall(String id) {
 	
+		
+		functionstack.push("");
+		TinyNode tnode8 = new TinyNode("push", "", "r0");
+		tinylist.add(tnode8);
+		functionstack.push("");
+		TinyNode tnode7 = new TinyNode("push", "", "r1");
+		tinylist.add(tnode7);
+		functionstack.push("");
+		TinyNode tnode6 = new TinyNode("push", "", "r2");
+		tinylist.add(tnode6);
+		functionstack.push("");
+		TinyNode tnode5 = new TinyNode("push", "", "r3");
+		tinylist.add(tnode5);
 		TinyNode tnode = new TinyNode("jsr", "", id);
 		tinylist.add(tnode);
+		TinyNode tnode1 = new TinyNode("pop", "", "r3");
+		tinylist.add(tnode1);
+		TinyNode tnode2 = new TinyNode("pop", "", "r2");
+		tinylist.add(tnode2);
+		TinyNode tnode3 = new TinyNode("pop", "", "r1");
+		tinylist.add(tnode3);
+		TinyNode tnode4 = new TinyNode("pop", "", "r0");
+		tinylist.add(tnode4);
+		TinyNode tnode9 = new TinyNode("pop", "", "");
+		for (int i=0;i<argcounter;argcounter--) {
+			tinylist.add(tnode9);
+		}
+		//create new register
+		String t_res = newTinyReg();
+		
+		//pop return value		
+		TinyNode tnode10 = new TinyNode("pop", "", t_res);
+		tinylist.add(tnode10);
+
+		stack.push(t_res);
+		
 	}
 
 	////////////////////////
