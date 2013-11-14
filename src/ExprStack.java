@@ -33,14 +33,17 @@ public class ExprStack {
 		TinyNode tnode1 = new TinyNode("push", "", "");
 		tinylist.add(tnode1);
 		functionstack.push("");
+		TinyNode tnode2 = new TinyNode("push", "", "r0");
+		tinylist.add(tnode2);
 		functionstack.push("");
+		TinyNode tnode3 = new TinyNode("push", "", "r1");
+		tinylist.add(tnode3);
 		functionstack.push("");
+		TinyNode tnode4 = new TinyNode("push", "", "r2");
+		tinylist.add(tnode4);
 		functionstack.push("");
-		functionstack.push("");
-		functionstack.push("");
-		functionstack.push("");
-		functionstack.push("");
-		functionstack.push("");
+		TinyNode tnode5 = new TinyNode("push", "", "r3");
+		tinylist.add(tnode5);
 	}
 	
 	////////////////////////
@@ -56,10 +59,14 @@ public class ExprStack {
 		irnode.printNode();
 		
 		//Tiny
-		TinyNode tnode1 = new TinyNode("jmp ", "", "main");		
-		tinylist.add(tnode1);		
-		TinyNode tnode2 = new TinyNode("label ", "", id);		
-		tinylist.add(tnode2);
+		TinyNode tnode1 = new TinyNode("jsr ", "", "main");		
+		tinylist.add(tnode1);
+		TinyNode tnode2 = new TinyNode("sys ", "", "halt");		
+		tinylist.add(tnode2);		
+		TinyNode tnode3 = new TinyNode("label ", "", id);		
+		tinylist.add(tnode3);		
+		TinyNode tnode4 = new TinyNode("link ", "", "5");		
+		tinylist.add(tnode4);
 	}
 
 	////////////////////////
