@@ -6,7 +6,9 @@ public class SymbolHashStack {
 
 	//instantiate stack object and scope tracker 
 	private static Stack<SymbolHash> symbolHashStack = new Stack<SymbolHash>();
+	private static Stack<SymbolHash> symbolHashStackHandler = new Stack<SymbolHash>();
 	private static int scope = 1;
+	private static int globaltraversaltracker = 0;
 	
 	//***********************
 	//	methods 
@@ -61,13 +63,41 @@ public class SymbolHashStack {
 		SymbolHash tempHash = symbolHashStack.pop();
 	}
 	
+	//check global symbol type
+	public static String checkGlobal(String name) {
+
+		String type = "";
+		SymbolHash tempHash = symbolHashStack.pop();
+		System.out.println(";Stack handling: " + tempHash.checkScope());
+		symbolHashStackHandler.push(tempHash);
+		globaltraversaltracker++;
+		while (tempHash.checkScope().contains("GLOBAL")!=true) {
+		
+			tempHash = symbolHashStack.pop();
+			System.out.println(";Stack handling: " + tempHash.checkScope());
+			symbolHashStackHandler.push(tempHash);
+			globaltraversaltracker++;
+		}
+		for (int i=0; i < globaltraversaltracker; globaltraversaltracker--) {
+	
+			type = tempHash.checkType(name);
+			tempHash = symbolHashStackHandler.pop();
+			System.out.println(";Stack handling: " + tempHash.checkScope());
+			symbolHashStack.push(tempHash);
+		}
+		return type;
+	}
+
 	//check id's type
 	public static String checkType(String name) {
-		
+				
+		String type;
 		SymbolHash tempHash = symbolHashStack.pop();
-		String type = tempHash.checkType(name);
+		type = tempHash.checkType(name);
 		symbolHashStack.push(tempHash);
-
+		if (type == "E") {
+			type = checkGlobal(name);
+		}
 		return type;
 	}
 }

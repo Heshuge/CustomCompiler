@@ -51,7 +51,12 @@ public class SymbolHash {
 	
 	public String checkType(String name) {
 
-		return symbolMap.get(name);	
+		if (symbolMap.get(name) != null) {
+			return symbolMap.get(name);
+		}
+		//else throw error
+		System.out.println(";ERROR: TYPE NOT FOUND IN SCOPE: " + checkScope());
+		return "E";
 	}
 
 	//print the Tiny Code
