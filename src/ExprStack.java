@@ -30,6 +30,8 @@ public class ExprStack {
 	public static void globalPush() {
 	
 		functionstack.push("");
+		TinyNode tnode1 = new TinyNode("push", "", "");
+		tinylist.add(tnode1);
 		functionstack.push("");
 		functionstack.push("");
 		functionstack.push("");
@@ -62,13 +64,13 @@ public class ExprStack {
 
 	////////////////////////
 	//
-	//	functionReturn
+	//	functionEnd
 	//
 	//
 	////////////////////////
-	public static void functionReturn() {
+	public static void functionEnd() {
 	
-		TinyNode tnode = new TinyNode("ret", "", "");		
+		TinyNode tnode = new TinyNode("end", "", "");		
 		tinylist.add(tnode);
 	}
 
@@ -78,16 +80,41 @@ public class ExprStack {
 	//
 	//
 	////////////////////////
-	public static void functionPush(String id, String id_list) {
+	public static void functionPush(String expression) {
 	
+		
 		functionstack.push("");
 		TinyNode tnode1 = new TinyNode("push", "", "");
 		tinylist.add(tnode1);
-		functionstack.push(id_list);
-		TinyNode tnode2 = new TinyNode("push", "", id_list);
+		functionstack.push(expression);
+		TinyNode tnode2 = new TinyNode("push", "", expression);
 		tinylist.add(tnode2);
-		TinyNode tnode3 = new TinyNode("jsr", "", id);
-		tinylist.add(tnode3);
+	}
+	
+	////////////////////////
+	//
+	//	functionCall
+	//
+	//
+	////////////////////////
+	public static void functionCall(String id) {
+	
+		TinyNode tnode = new TinyNode("jsr", "", id);
+		tinylist.add(tnode);
+	}
+
+	////////////////////////
+	//
+	//	functionReturn
+	//
+	//
+	////////////////////////
+	public static void functionReturn(String id) {
+	
+		TinyNode tnode1 = new TinyNode("unlnk", "", "");
+		tinylist.add(tnode1);
+		TinyNode tnode2 = new TinyNode("ret", "", "");
+		tinylist.add(tnode2);
 	}
 
 	////////////////////////
@@ -210,11 +237,24 @@ public class ExprStack {
 	////////////////////////
 	public static void evaluateWrite(String id_list, String type) {
 
-		IRNode irnode = new IRNode("WRITE"+type, "", "", id_list);
-		irnode.printNode();
-		TinyNode tnode = new TinyNode("sys", "write", id_list);
-		tinylist.add(tnode);		
-
+		//if (id_list.contains(",")) {
+			//String[] ids = id_list.split(",");
+			//for (int i = 0; i < id_list.length(); i++) {
+				//IR
+				//IRNode irnode = new IRNode("WRITE"+type, "", "", ids[i]);
+				//irnode.printNode();
+				//Tiny
+				//TinyNode tnode = new TinyNode("sys", "write"+type, ids[i]);
+				//tinylist.add(tnode);
+			//}
+		//} else {
+			//IR
+			IRNode irnode = new IRNode("WRITE"+type, "", "", id_list);
+			irnode.printNode();
+			//Tiny
+			TinyNode tnode = new TinyNode("sys", "write"+type, id_list);
+			tinylist.add(tnode);	
+		//}	
     }
 	
 	////////////////////////

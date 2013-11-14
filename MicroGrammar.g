@@ -65,7 +65,7 @@ function_head	:	'FUNCTION' variable_type id {SymbolHashStack.newFunction($id.tex
 
 function_body	:	'BEGIN' decl statement_list;
 
-function_foot	:	'END' {SymbolHashStack.popHash(); ExprStack.functionReturn();};
+function_foot	:	'END' {SymbolHashStack.popHash(); ExprStack.functionEnd();};
 
 
 
@@ -76,7 +76,7 @@ function_foot	:	'END' {SymbolHashStack.popHash(); ExprStack.functionReturn();};
 
 statement_list	:	statement* ;
 
-statement		:	assignment_s | function_s | read_s | write_s | return_s | if_stmt | do_while_stmt ;
+statement		:	assignment_s | read_s | write_s | return_s | if_stmt | do_while_stmt ;
 
 // Basic Statements
 
@@ -86,9 +86,7 @@ read_s			:	'READ' '(' id_list ')' {ExprStack.evaluateRead($id_list.text, SymbolH
 
 write_s			:	'WRITE' '(' id_list ')' {ExprStack.evaluateWrite($id_list.text, SymbolHashStack.checkType($id_list.text));}';';
 
-function_s		:	id '(' id_list ')' {ExprStack.functionPush($id.text, $id_list.text);}';';
-
-return_s		:	'RETURN' expression {ExprStack.functionPop($expression.text);}';';
+return_s		:	'RETURN' expression {ExprStack.functionReturn($expression.text);}';';
 
 
 // Complex Statements
@@ -144,11 +142,11 @@ primary			:	('('expression')') | (single_id {ExprStack.addRIdentifier($single_id
 
 single_id		:	id | INTLITERAL | FLOATLITERAL;
 
-call_expr		:	id '(' expr_list? ')';
+call_expr		:	id '(' expr_list? ')' {ExprStack.functionCall($id.text);};
 
-expr_list		:	expression expr_list_tail;
+expr_list		:	expression expr_list_tail {ExprStack.functionPush($expression.text);};
 
-expr_list_tail	:	(',' expression expr_list_tail)?;
+expr_list_tail	:	(',' expression expr_list_tail {ExprStack.functionPush($expression.text);})?;
 
 addop			:	'+' | '-';
 
