@@ -80,9 +80,9 @@ public class SymbolHashStack {
 			globaltraversaltracker++;
 		}
 		for (int j=0;j<names.length;j++) {
-			System.out.println(names[j]);
+			//System.out.println(names[j]);
 			type = tempHash.checkType(names[j]);
-			System.out.println(type);
+			//System.out.println(type);
 		}
 		for (int i=0; i < globaltraversaltracker; globaltraversaltracker--) {
 		
@@ -102,9 +102,9 @@ public class SymbolHashStack {
 		names = name.split(",");
 		SymbolHash tempHash = symbolHashStack.pop();
 		for (int i=0;i<names.length;i++) {
-			System.out.println(names[i]);
+			//System.out.println(names[i]);
 			type = tempHash.checkType(names[i]);
-			System.out.println(type);
+			//System.out.println(type);
 			symbolHashStack.push(tempHash);
 		}
 		if (type == "E") {

@@ -265,13 +265,19 @@ public class ExprStack {
 
 		String res = stack.pop();
 		String op1 = stack.pop();
-		//replace $T with r
-		op1 = op1.replace("$T","r");
+
+		if (op1.contains("$T")) {		
+			//replace $T with r
+			op1 = op1.replace("$T","r");
 		
-		//lower number by 1
-		if (op1.contains("r")) {
+			//lower number by 1
+			if (op1.contains("r")) {
 		
-			op1 = "r" + Integer.toString(op1.compareTo("r0")-1);
+				op1 = "r" + Integer.toString(op1.compareTo("r0")-1);
+			}
+
+		} else {
+			op1 = "r" + Integer.toString(op1.compareTo("r0"));
 		}
 		String optype = "I";
 		IRNode irnode = new IRNode("STORE"+optype, op1, "", res);
