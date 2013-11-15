@@ -75,19 +75,18 @@ public class SymbolHashStack {
 		while (tempHash.checkScope().contains("GLOBAL")!=true) {
 		
 			tempHash = symbolHashStack.pop();
-			System.out.println(";Stack handling: " + tempHash.checkScope());
 			symbolHashStackHandler.push(tempHash);
 			globaltraversaltracker++;
 		}
 		for (int j=0;j<names.length;j++) {
 			//System.out.println(names[j]);
 			type = tempHash.checkType(names[j]);
+			System.out.println(";Stack handling: " + tempHash.checkScope());
 			//System.out.println(type);
 		}
 		for (int i=0; i < globaltraversaltracker; globaltraversaltracker--) {
 		
 			tempHash = symbolHashStackHandler.pop();
-			System.out.println(";Stack handling: " + tempHash.checkScope());
 			symbolHashStack.push(tempHash);
 		}
 		return type;
@@ -109,6 +108,8 @@ public class SymbolHashStack {
 		}
 		if (type == "E") {
 			type = checkGlobal(name);
+		} else {
+			System.out.println(";Stack handling: " + tempHash.checkScope());
 		}
 		return type;
 	}
