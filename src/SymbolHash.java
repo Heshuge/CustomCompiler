@@ -6,10 +6,13 @@ import java.util.HashMap;
 public class SymbolHash {
 
 	//instantiate stack object and scope tracker 
+	//build off pre-defined Symbol class
 	private ArrayList<Symbol> symbolList = new ArrayList<Symbol>();
 	private HashMap<String, String> symbolMap = new HashMap<String, String>();
+
 	private ArrayList<IRNode> irNodeList = new ArrayList<IRNode>();
 	private HashMap<String, String> irNodeMap = new HashMap<String, String>();
+
 	private String scope; 
 
 	//***********************
@@ -49,6 +52,24 @@ public class SymbolHash {
 		}
 	}
 	
+	//check IR register Type
+	public String getIRType(String name) {
+		return irNodeMap.get(name);
+	}
+
+	//new IR
+	public void newIRNode(String name, String irtype) {
+
+		if (!irNodeMap.containsKey(name)) {
+			//irNodeList.add(new IRNode(name, irtype, ""));
+			irNodeMap.put(name, irtype);
+			//System.out.println("New IR:" + irNodeMap.get(name));
+		} else {
+			irNodeMap.put(name, irNodeMap.get(name));
+			//System.out.println("Old IR:" + irNodeMap.get(name));
+		}
+	}	
+	
 	public String checkType(String name) {
 
 		if (symbolMap.get(name) != null) {
@@ -76,6 +97,7 @@ public class SymbolHash {
 	public void printIRCode() {
 		
 		System.out.println(";IR code");
+		System.out.println();
 	}
 	//print IRNode data
 	public void printIRNode() {

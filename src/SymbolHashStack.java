@@ -41,6 +41,23 @@ public class SymbolHashStack {
 		symbolHashStack.push(tempHash);
 	}
 
+	//check IR type
+	public static String getIRReg(String name) {
+		SymbolHash tempHash = symbolHashStack.pop();
+		String l_reg = tempHash.getIRType(name);
+		symbolHashStack.push(tempHash);
+		return l_reg;
+		
+	}
+
+	//add new symbol to current stack hash
+	public static void newIRNode(String name, String irtype) {
+
+		SymbolHash tempHash = symbolHashStack.pop();
+		tempHash.newIRNode(name, irtype);
+		symbolHashStack.push(tempHash);
+	}
+
 	//print ";tiny code" header
 	public static void printTinyCode() {
 
@@ -81,7 +98,6 @@ public class SymbolHashStack {
 		for (int j=0;j<names.length;j++) {
 			//System.out.println(names[j]);
 			type = tempHash.checkType(names[j]);
-			System.out.println(";Stack handling: " + tempHash.checkScope());
 			//System.out.println(type);
 		}
 		for (int i=0; i < globaltraversaltracker; globaltraversaltracker--) {
@@ -109,7 +125,7 @@ public class SymbolHashStack {
 		if (type == "E") {
 			type = checkGlobal(name);
 		} else {
-			System.out.println(";Stack handling: " + tempHash.checkScope());
+			
 		}
 		return type;
 	}

@@ -36,7 +36,7 @@ string			:	STRINGLITERAL;
 
 /* Variable Declaration */
 
-variable_list	:	variable_type id_list ';' {SymbolHashStack.newSymbol($variable_type.text, $id_list.text, null); };
+variable_list	:	variable_type id_list ';' {SymbolHashStack.newSymbol($variable_type.text, $id_list.text, null);};
 
 variable_type	:	('FLOAT' | 'INT' | 'VOID');
 
@@ -82,9 +82,9 @@ statement		:	assignment_s | read_s | write_s | return_s | if_stmt | do_while_stm
 
 assignment_s	:	id ':=' expression {ExprStack.addLIdentifier($id.text); ExprStack.evaluateExpr();} ';';
 
-read_s			:	'READ' '(' id_list ')' {ExprStack.evaluateRead($id_list.text, SymbolHashStack.checkType($id_list.text));}';';
+read_s			:	'READ' '(' id_list ')' {ExprStack.evaluateRead($id_list.text);}';';
 
-write_s			:	'WRITE' '(' id_list ')' {ExprStack.evaluateWrite($id_list.text, SymbolHashStack.checkType($id_list.text));}';';
+write_s			:	'WRITE' '(' id_list ')' {ExprStack.evaluateWrite($id_list.text);}';';
 
 return_s		:	'RETURN' expression {ExprStack.functionReturn($expression.text);}';';
 
@@ -144,9 +144,9 @@ single_id		:	id | INTLITERAL | FLOATLITERAL;
 
 call_expr		:	id {ExprStack.functionRP();} '(' expr_list? ')' {ExprStack.functionCall($id.text);};
 
-expr_list		:	expression expr_list_tail {ExprStack.functionPush($expression.text);};
+expr_list		:	expression expr_list_tail {ExprStack.functionPushParameter($expression.text);};
 
-expr_list_tail	:	(',' expression expr_list_tail {ExprStack.functionPush($expression.text);})?;
+expr_list_tail	:	(',' expression expr_list_tail {ExprStack.functionPushParameter($expression.text);})?;
 
 addop			:	'+' | '-';
 
