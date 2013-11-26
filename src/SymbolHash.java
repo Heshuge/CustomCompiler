@@ -44,6 +44,7 @@ public class SymbolHash {
 				//if not, add it
 				symbolList.add(new Symbol(names[i].trim(), type, value));
 				symbolMap.put(names[i].trim(), type);
+				//System.out.println("New Symbol: " + type + " " + names[i].trim() + " " + value);
 			}
 			else {
 				//else throw error
@@ -63,10 +64,10 @@ public class SymbolHash {
 		if (!irNodeMap.containsKey(name)) {
 			//irNodeList.add(new IRNode(name, irtype, ""));
 			irNodeMap.put(name, irtype);
-			//System.out.println("New IR:" + irNodeMap.get(name));
+			//System.out.println("New IR: " + irNodeMap.get(name));
 		} else {
 			irNodeMap.put(name, irNodeMap.get(name));
-			//System.out.println("Old IR:" + irNodeMap.get(name));
+			System.out.println("Old IR: " + irNodeMap.get(name));
 		}
 	}	
 	

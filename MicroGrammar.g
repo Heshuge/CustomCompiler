@@ -95,15 +95,15 @@ if_stmt			:	if_stmt_head if_stmt_body if_stmt_foot;
 
 // If Statement Format
 
-if_stmt_head	:	'IF' '(' cond ')' {SymbolHashStack.newBlock(); ExprStack.evaluateIf($cond.text);};
+if_stmt_head	:	'IF' '(' cond ')' {ExprStack.evaluateIf($cond.text);}; // SymbolHashStack.newBlock();
 
 if_stmt_body	:	decl statement_list else_if;
 
-if_stmt_foot	:	'ENDIF' {ExprStack.labelEndIf(); SymbolHashStack.popHash();};
+if_stmt_foot	:	'ENDIF' {ExprStack.labelEndIf();}; //SymbolHashStack.popHash();
 
-else_if			:	( {SymbolHashStack.newBlock();} 'ELSIF' '(' cond ')' {ExprStack.evaluateElseIf($cond.text);} decl {SymbolHashStack.popHash();} statement_list else_if )?;
+else_if			:	('ELSIF' '(' cond ')' {ExprStack.evaluateElseIf($cond.text);} decl statement_list else_if )?; //SymbolHashStack.newBlock();{SymbolHashStack.popHash();}
 
-else_s			:	{SymbolHashStack.newBlock();} 'ELSE' decl {SymbolHashStack.popHash();} statement_list;
+else_s			:	'ELSE' decl statement_list; //{SymbolHashStack.newBlock();} {SymbolHashStack.popHash();}
 
 // Conditionals
 

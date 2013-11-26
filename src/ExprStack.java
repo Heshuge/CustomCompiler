@@ -143,11 +143,12 @@ public class ExprStack {
 		//need to know localIR associated with this variable
 		//look for $L that matched parameter
 		//check if its not already in the HashMap
-
+		
 		//IR
+		IRNode irnode = new IRNode("", "", "", "");
 		//Push return node
 		if (argcounter++ == 0) {
-			IRNode irnode = new IRNode("PUSH", "", "", "");
+			irnode = new IRNode("PUSH", "", "", "");
 			irnode.printNode();
 		}
 
@@ -158,8 +159,8 @@ public class ExprStack {
 	
 		SymbolHashStack.newIRNode(parameter, l_res);
 		
-		IRNode irnode = new IRNode("PUSH", l_res, "", "");
-		irnode.printNode();
+		IRNode irnode1 = new IRNode("PUSH", ""+registercount, "", "");
+		irnode1.printNode();
 
 		//Tiny
 		functionstack.push(parameter);
@@ -282,6 +283,8 @@ public class ExprStack {
 			irnode1.printNode();
 			IRNode irnode2 = new IRNode("STORE"+optype, res, "$R", "");
 			irnode2.printNode();
+			IRNode irnode = new IRNode("RET", "", "", "");
+			irnode.printNode();
 
 		} else {
 			//if variable
@@ -332,8 +335,8 @@ public class ExprStack {
 
 		String op2 = stack.pop();
 		String op1 = stack.pop();
-		String p_res1 = newParameter();
-		String p_res2 = newParameter();
+		//String p_res1 = newParameter();
+		//String p_res2 = newParameter();
 
 		stack.push(res);
 
@@ -375,7 +378,7 @@ public class ExprStack {
 
 		
 		//IR
-		IRNode irnode = new IRNode(instruction+optype, p_res1, p_res2, res);
+		IRNode irnode = new IRNode(instruction+optype, op1, op2, res);
 		irnode.printNode();
 
 		//Tiny
@@ -531,16 +534,20 @@ public class ExprStack {
 	public static void evaluateIf(String cond) {
 
 		String label = newLabel();
-		String t_label = newTinyLabel();
-		
-		//String t_res = newTinyReg();
+		String t_label = newTinyLabel();		
 	
 		String compop = "";
 		String lhe = "";
 		String rhe = "";
 	
-		if (cond.contains("TRUE")) {
+		if (cond == "TRUE") {
 			lhe = "0";
+			rhe = "0";
+			compop = "jne";
+		}
+
+		if (cond == "FALSE") {
+			lhe = "1";
 			rhe = "0";
 			compop = "jne";
 		}
@@ -589,13 +596,21 @@ public class ExprStack {
 
 		}
 
-		//push if-statement label onto stack
-		
+		//IR
+		String op = "";
+		String reg1 = newRegister();
+		String reg2 = newRegister();
 
-		//add label node for endif
-		TinyNode tnode = new TinyNode("label", "", t_label);
+		IRNode irnodel = new IRNode("STORE"+op, lhe, reg1, "");
+		irnodel.printNode();
+		IRNode irnoder = new IRNode("STORE"+op, rhe, reg2, "");
+		irnoder.printNode();
+
+		IRNode irnode2 = new IRNode(compop, "", "", "");
+		irnode2.printNode();
+
+		//Tiny
 		labelstack.push(t_label);
-		//tinylist.add(tnode);
 
 		//add mov node(s)
 		TinyNode t1node = new TinyNode("move", "?", "?");
@@ -606,7 +621,7 @@ public class ExprStack {
 		tinylist.add(t2node);
 
 		//add jne node
-		TinyNode t3node = new TinyNode(compop, "", "label"+tinylabelcount);
+		TinyNode t3node = new TinyNode(compop, "label"+tinylabelcount, "");
 		tinylist.add(t3node);
 		
 		
@@ -687,10 +702,25 @@ public class ExprStack {
 
 		}
 
-		//add label node
-		IRNode irnode = new IRNode("LABEL", "", "", label);
-		irnode.printNode();
-		TinyNode tnode = new TinyNode("label", "", t_label);
+		
+		//IR
+		IRNode irnode1 = new IRNode("LABEL", label, "", "");
+		irnode1.printNode();
+	
+		String op = "";
+		String reg1 = newRegister();
+		String reg2 = newRegister();
+
+		IRNode irnodel = new IRNode("STORE"+op, lhe, reg1, "");
+		irnodel.printNode();
+		IRNode irnoder = new IRNode("STORE"+op, rhe, reg2, "");
+		irnoder.printNode();
+
+		IRNode irnode2 = new IRNode(compop, "", "", "");
+		irnode2.printNode();
+
+		//Tiny
+		TinyNode tnode = new TinyNode("label", t_label, "");
 		tinylist.add(tnode);
 
 		//add mov node(s)
@@ -702,7 +732,7 @@ public class ExprStack {
 		tinylist.add(t2node);
 
 		//add compop node
-		TinyNode t3node = new TinyNode(compop, "", "label"+tinylabelcount);
+		TinyNode t3node = new TinyNode(compop, "label"+tinylabelcount, "");
 		tinylist.add(t3node);
 		
 	}
@@ -721,11 +751,11 @@ public class ExprStack {
 		endiflabel = labelstack.pop();
 
 		//add label node
-		IRNode irnode = new IRNode("LABEL", "", "", label);
+		IRNode irnode = new IRNode("LABEL", label, "", "");
 		irnode.printNode();
-		TinyNode tnode1 = new TinyNode("label", "", t_label);
+		TinyNode tnode1 = new TinyNode("label", t_label, "");
 		tinylist.add(tnode1);
-		TinyNode tnode2 = new TinyNode("label", "", endiflabel);
+		TinyNode tnode2 = new TinyNode("label", endiflabel, "");
 		tinylist.add(tnode2);
 
 	}
@@ -745,9 +775,9 @@ public class ExprStack {
 		dowhilestack.push(t_label);
 
 		//add label node
-		IRNode irnode = new IRNode("LABEL", "", "", label);
+		IRNode irnode = new IRNode("LABEL", label, "", "");
 		irnode.printNode();
-		TinyNode tnode = new TinyNode("label", "", t_label);
+		TinyNode tnode = new TinyNode("label", t_label, "");
 		tinylist.add(tnode);
 
 		
@@ -827,7 +857,7 @@ public class ExprStack {
 		tinylist.add(t2node);
 
 		//add jump node
-		TinyNode t3node = new TinyNode(compop, "", dowhilelabel);
+		TinyNode t3node = new TinyNode(compop, dowhilelabel, "");
 		tinylist.add(t3node);
 		
 		
@@ -843,7 +873,6 @@ public class ExprStack {
 		
 		String op1 = lit;
 		String res = newRegister();
-		//String t_res = newTinyReg();
 
 		//check optype
 		String optype = SymbolHashStack.checkType(op1).split("")[1];
