@@ -58,15 +58,15 @@ public class IRNode {
 	//prints the IRNode code
 	public void printNode() {
 
-		if(this.opcode.equals("STOREI")) {
-			System.out.println(";" + this.opcode + " " + this.first_operand + " " + this.result);
-		}
-		else if(this .opcode.equals("WRITEI")) {
-			System.out.println(";" + this.opcode + " " + this.result);
-		}
-		else {
+		//if(this.opcode.contains("STORE")) {
+		//	System.out.println(";" + this.opcode + " " + this.first_operand + " " + this.result);
+		//}
+		//else if(this.opcode.equals("WRITEI")) {
+		//	System.out.println(";" + this.opcode + " " + this.result);
+		//}
+		//else {
 			System.out.println(";" + this.opcode + " " + this.first_operand + " " + this.second_operand + " " + this.result);
-		}
+		//}
 	}
 	
 }

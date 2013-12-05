@@ -115,11 +115,11 @@ do_while_stmt	:	do_while_head do_while_body do_while_foot;
 
 // Do While Statment Format
 
-do_while_head	:	'DO' {SymbolHashStack.newBlock(); ExprStack.labelDoWhile();};
+do_while_head	:	'DO' {ExprStack.labelDoWhile();}; //SymbolHashStack.newBlock();
 
 do_while_body	:	decl statement_list 'WHILE' '(' cond ')' {ExprStack.evaluateDoWhile($cond.text);};
 
-do_while_foot	:	';' {SymbolHashStack.popHash();};
+do_while_foot	:	';'; //{SymbolHashStack.popHash();}
 
 
 

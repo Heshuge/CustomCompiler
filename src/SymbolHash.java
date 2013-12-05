@@ -64,10 +64,10 @@ public class SymbolHash {
 		if (!irNodeMap.containsKey(name)) {
 			//irNodeList.add(new IRNode(name, irtype, ""));
 			irNodeMap.put(name, irtype);
-			//System.out.println("New IR: " + irNodeMap.get(name));
+			//System.out.println(";New IR: " + irNodeMap.get(name));
 		} else {
 			irNodeMap.put(name, irNodeMap.get(name));
-			System.out.println("Old IR: " + irNodeMap.get(name));
+			//System.out.println(";Old IR: " + irNodeMap.get(name));
 		}
 	}	
 	

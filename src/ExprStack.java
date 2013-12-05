@@ -14,6 +14,8 @@ public class ExprStack {
 	private static Stack<String> functionstack = new Stack<String>();
 	//tiny node list
 	private static ArrayList<TinyNode> tinylist = new ArrayList<TinyNode>();
+	//tiny register stack
+    private static Stack<String> tinystack = new Stack<String>();
 	//counters
     private static int parametercount = 1;
     private static int localIRcount = 1;
@@ -50,6 +52,16 @@ public class ExprStack {
 		functionstack.push("");
 		TinyNode tnode5 = new TinyNode("push", "r3", "");
 		tinylist.add(tnode5);
+
+
+		//stack buffer for testing REMOVE ASAP
+		
+		tinystack.push("1");
+		tinystack.push("2");
+		tinystack.push("3");
+		tinystack.push("4");
+		tinystack.push("5");
+
 	}
 	
 	////////////////////////
@@ -77,14 +89,17 @@ public class ExprStack {
 				if (parameters[i].contains("INT")) {
 					type = "INT";
 					name = parameters[i].replace("INT", "");
-					
+					SymbolHashStack.newIRNode(name, p_res);
+
 				} else if (parameters[i].contains("FLOAT")) {
 					type = "FLOAT";
 					name = parameters[i].replace("FLOAT", "");
+					SymbolHashStack.newIRNode(name, p_res);
 
 				} else if (parameters[i].contains("STRING")) {
 					type = "STRING";
 					name = parameters[i].replace("STRING", "");
+					SymbolHashStack.newIRNode(name, p_res);
 
 				} else {
 					System.out.println(";Warning: Unknown type");
@@ -99,13 +114,13 @@ public class ExprStack {
 		irnode2.printNode();
 		
 		//Tiny
-		TinyNode tnode1 = new TinyNode("jsr ", "main", "");		
+		TinyNode tnode1 = new TinyNode("jsr", "main", "");		
 		tinylist.add(tnode1);
-		TinyNode tnode2 = new TinyNode("sys ", "halt", "");		
+		TinyNode tnode2 = new TinyNode("sys", "halt", "");		
 		tinylist.add(tnode2);		
-		TinyNode tnode3 = new TinyNode("label ", id, "");		
+		TinyNode tnode3 = new TinyNode("label", id, "");		
 		tinylist.add(tnode3);		
-		TinyNode tnode4 = new TinyNode("link", "?", "");		
+		TinyNode tnode4 = new TinyNode("link", "10", "");		
 		tinylist.add(tnode4);
 
 		
@@ -139,10 +154,6 @@ public class ExprStack {
 	//
 	////////////////////////
 	public static void functionPushParameter(String parameter) {
-
-		//need to know localIR associated with this variable
-		//look for $L that matched parameter
-		//check if its not already in the HashMap
 		
 		//IR
 		IRNode irnode = new IRNode("", "", "", "");
@@ -151,20 +162,22 @@ public class ExprStack {
 			irnode = new IRNode("PUSH", "", "", "");
 			irnode.printNode();
 		}
-
-		String l_res = SymbolHashStack.getIRReg(parameter);
-		//String t_res = SymbolHashStack.checkType(parameter);
-
-		//System.out.println("                    " + parameter + ":" + l_res + ":" + t_res);
-	
-		SymbolHashStack.newIRNode(parameter, l_res);
 		
-		IRNode irnode1 = new IRNode("PUSH", ""+registercount, "", "");
+		//need to know localIR associated with this variable
+		//look for $L that matched parameter
+		//check if its not already in the HashMap
+		if (SymbolHashStack.getIRReg(parameter) != null) {
+			parameter = SymbolHashStack.getIRReg(parameter);
+		} else {
+			parameter = "$T"+(registercount-1);
+		}
+
+		IRNode irnode1 = new IRNode("PUSH", parameter, "", "");
 		irnode1.printNode();
 
 		//Tiny
 		functionstack.push(parameter);
-		TinyNode tnode2 = new TinyNode("push", "?", "");
+		TinyNode tnode2 = new TinyNode("push", "$-"+argcounter, "");
 		tinylist.add(tnode2);
 	}
 
@@ -251,10 +264,13 @@ public class ExprStack {
 			tinylist.add(tnode9);
 		}
 		//create new register
-		//String t_res = newTinyReg();
+		String t_res = newTinyReg();
 		
+		//save reg id for move
+		tinystack.push(t_res);
+
 		//pop return value		
-		TinyNode tnode10 = new TinyNode("pop", "?", "");
+		TinyNode tnode10 = new TinyNode("pop", t_res, "");
 		tinylist.add(tnode10);
 
 		stack.push(res);
@@ -275,27 +291,43 @@ public class ExprStack {
 			//track things
 			String optype = SymbolHashStack.checkType(id).split("")[1];
 
-			//create new register
-			String res = newRegister();
+			if (optype == "E") {
+				if (id.contains(".")) {
+					optype = "F";
+				} else {
+					optype = "I";
+				}
+			}
 		
 			//IR
-			IRNode irnode1 = new IRNode("STORE"+optype, id, res, "");
-			irnode1.printNode();
-			IRNode irnode2 = new IRNode("STORE"+optype, res, "$R", "");
+			IRNode irnode2 = new IRNode("STORE"+optype, id, "$R", "");
 			irnode2.printNode();
 			IRNode irnode = new IRNode("RET", "", "", "");
 			irnode.printNode();
+			//Tiny
+			TinyNode tnode1 = new TinyNode("move", id, "$8");
+			tinylist.add(tnode1);
 
 		} else {
 			//if variable
 			//check optype
+			//System.out.println(SymbolHashStack.getIRReg(id));
 			String optype = SymbolHashStack.checkType(id).split("")[1];
+					
+			if (optype == "E") {
+				if (id.contains(".")) {
+					optype = "F";
+				} else {
+					optype = "I";
+				}
+			}
 
-			//track things
-		
 			//IR
-			IRNode irnode = new IRNode("STORE"+optype, "$L"+(localIRcount-1), "$R", "");
+			IRNode irnode = new IRNode("STORE"+optype, SymbolHashStack.getIRReg(id), "$R", "");
 			irnode.printNode();
+			//Tiny
+			TinyNode tnode1 = new TinyNode("move", id, "$8");
+			tinylist.add(tnode1);
 		}
 
 		//Tiny
@@ -338,8 +370,6 @@ public class ExprStack {
 		//String p_res1 = newParameter();
 		//String p_res2 = newParameter();
 
-		stack.push(res);
-
 		//check optype
 		String optype = SymbolHashStack.checkType(op1).split("")[1];
 
@@ -376,16 +406,31 @@ public class ExprStack {
 			tiny_instr	= "div"; 
 		}	
 
-		
+		//GENERALLY IMPORTANT
 		//IR
+		stack.push(res);	
+		SymbolHashStack.newIRNode(op1+op+op2, res);
+
+		if (SymbolHashStack.getIRReg(op1) != null) {
+			op1 = SymbolHashStack.getIRReg(op1);
+		}
+		if (SymbolHashStack.getIRReg(op2) != null) {
+			op2 = SymbolHashStack.getIRReg(op2);
+		}
+		
+		//SymbolHashStack.newIRNode(op1+op+op2, res);
+
 		IRNode irnode = new IRNode(instruction+optype, op1, op2, res);
 		irnode.printNode();
 
 		//Tiny
-		//String t_res = newTinyReg();
-		TinyNode t1node = new TinyNode("move", "?", "?");
+		String t_res = newTinyReg();
+
+		tinystack.push(t_res);
+
+		TinyNode t1node = new TinyNode("move", "$"+(6+parametercount), t_res);
 		tinylist.add(t1node);
-		TinyNode t2node = new TinyNode(tiny_instr+tiny_ot, "?", "?");
+		TinyNode t2node = new TinyNode(tiny_instr+tiny_ot, "$"+(5+parametercount), t_res);
 		tinylist.add(t2node);
     }
 
@@ -402,19 +447,29 @@ public class ExprStack {
 		String op1 = stack.pop();
 
 		String l_IR = newLocalIR();
+
 		//bind local register and variable name
 		SymbolHashStack.newIRNode(res, l_IR);
-
+		
 		//check optype
 		String optype = SymbolHashStack.checkType(res).split("")[1];
 
+		if (optype == "E") {
+			if (res.contains(".")) {
+				optype = "F";
+			} else {
+				optype = "I";
+			}
+		}
+
 		//IR	
-		IRNode irnode = new IRNode("STORE"+optype, "$T"+(registercount-1), l_IR, "");
+		IRNode irnode = new IRNode("STORE"+optype, op1, l_IR, "");
 		irnode.printNode();
 		
 		//Tiny
+		String t_reg = tinystack.pop();
 		
-		TinyNode tnode = new TinyNode("move", "?", "?");
+		TinyNode tnode = new TinyNode("move", t_reg, l_IR);
 		tinylist.add(tnode);
     }
 
@@ -447,12 +502,12 @@ public class ExprStack {
 			if (optype.contains("INT")) {
 				i_type = "I";
 				t_type = "i";
-				reg = "?";
+				reg = reg;
 			}
 			if (optype.contains("FLOAT")) {
 				i_type = "F";
 				t_type = "r";
-				reg = "?";
+				reg = reg;
 			}
 
 			
@@ -495,6 +550,8 @@ public class ExprStack {
 			l_IR = newLocalIR();	
 			optype = SymbolHashStack.checkType(ids[i]);
 			SymbolHashStack.newIRNode(ids[i], l_IR);
+			
+
 
 			//find type
 			if (optype.contains("STRING")) {
@@ -506,13 +563,13 @@ public class ExprStack {
 
 				i_type = "I";
 				t_type = "i";
-				reg = "?";
+				reg = "$-"+(localIRcount-1);
 			}
 			if (optype.contains("FLOAT")) {
 		
 				i_type = "F";
 				t_type = "r";
-				reg = "?";
+				reg = "$-"+(localIRcount-1);
 			}
 
 			//create IR
@@ -537,6 +594,7 @@ public class ExprStack {
 		String t_label = newTinyLabel();		
 	
 		String compop = "";
+		String comp = "";
 		String lhe = "";
 		String rhe = "";
 	
@@ -544,12 +602,14 @@ public class ExprStack {
 			lhe = "0";
 			rhe = "0";
 			compop = "jne";
+			comp = "NE";
 		}
 
 		if (cond == "FALSE") {
 			lhe = "1";
 			rhe = "0";
 			compop = "jne";
+			comp = "NE";
 		}
 	
 		if (cond.contains("!=")) {
@@ -558,6 +618,7 @@ public class ExprStack {
 			lhe = cond.split("!=")[0];
 			rhe = cond.split("!=")[1];
 			compop = "jeq";
+			comp = "EQ";
 			
 		} else if (cond.contains(">=")) {
 
@@ -565,6 +626,7 @@ public class ExprStack {
 			lhe = cond.split(">=")[0];
 			rhe = cond.split(">=")[1];
 			compop = "jlt";
+			comp = "LT";
 
 		} else if (cond.contains("<=")) {
 
@@ -572,20 +634,23 @@ public class ExprStack {
 			lhe = cond.split("<=")[0];
 			rhe = cond.split("<=")[1];
 			compop = "jgt";
+			comp = "GT";
 		
 		} else if (cond.contains(">")) {
 
 			//split into left and right hand expressions
 			lhe = cond.split(">")[0]; 
 			rhe = cond.split(">")[1]; 
-			compop = "jlt";
+			compop = "jle";
+			comp = "LE";
 
 		} else if (cond.contains("<")) {
 	
 			//split into left and right hand expressions
 			lhe = cond.split("<")[0]; 
 			rhe = cond.split("<")[1]; 
-			compop = "jgt";
+			compop = "jge";
+			comp = "GE";
 
 		} else if (cond.contains("=")) {
 
@@ -593,20 +658,31 @@ public class ExprStack {
 			lhe = cond.split("=")[0];
 			rhe = cond.split("=")[1];
 			compop = "jne";
+			comp = "NE";
 
 		}
 
 		//IR
-		String op = "";
+		String op = "I";
 		String reg1 = newRegister();
 		String reg2 = newRegister();
+		
+		//System.out.println(SymbolHashStack.getIRReg(lhe));
+		//System.out.println(SymbolHashStack.getIRReg(rhe));
+	
+		if (SymbolHashStack.getIRReg(lhe) != null) {
+			lhe = SymbolHashStack.getIRReg(lhe);
+		}
+		if (SymbolHashStack.getIRReg(rhe) != null) {
+			rhe = SymbolHashStack.getIRReg(rhe);
+		}
 
 		IRNode irnodel = new IRNode("STORE"+op, lhe, reg1, "");
 		irnodel.printNode();
 		IRNode irnoder = new IRNode("STORE"+op, rhe, reg2, "");
 		irnoder.printNode();
 
-		IRNode irnode2 = new IRNode(compop, "", "", "");
+		IRNode irnode2 = new IRNode(comp, reg1, reg2, "label"+labelcount);
 		irnode2.printNode();
 
 		//Tiny
@@ -639,7 +715,7 @@ public class ExprStack {
 		String t_label = newTinyLabel();
 
 		String compop = "";
-			
+		String comp = "";	
 		String lhe = "";
 		String rhe = "";
 
@@ -656,6 +732,14 @@ public class ExprStack {
 			lhe = "0";
 			rhe = "0";
 			compop = "jne";
+			comp = "NE";
+		}
+
+		if (cond == "FALSE") {
+			lhe = "1";
+			rhe = "0";
+			compop = "jne";
+			comp = "NE";
 		}
 		
 		if (cond.contains("!=")) {
@@ -664,6 +748,7 @@ public class ExprStack {
 			lhe = cond.split("!=")[0];
 			rhe = cond.split("!=")[1];
 			compop = "jeq";
+			comp = "EQ";
 			
 		} else if (cond.contains(">=")) {
 
@@ -671,6 +756,7 @@ public class ExprStack {
 			lhe = cond.split(">=")[0];
 			rhe = cond.split(">=")[1];
 			compop = "jlt";
+			comp = "LT";
 
 		} else if (cond.contains("<=")) {
 
@@ -678,20 +764,26 @@ public class ExprStack {
 			lhe = cond.split("<=")[0];
 			rhe = cond.split("<=")[1];
 			compop = "jgt";
+			comp = "GT";
+
 		
 		} else if (cond.contains(">")) {
 
 			//split into left and right hand expressions
 			lhe = cond.split(">")[0];
 			rhe = cond.split(">")[1]; 
-			compop = "jlt";
+			compop = "jle";
+			comp = "LE";
+
 
 		} else if (cond.contains("<")) {
 	
 			//split into left and right hand expressions
 			lhe = cond.split("<")[0]; 
 			rhe = cond.split("<")[1]; 
-			compop = "jgt";
+			compop = "jge";
+			comp = "GE";
+
 
 		} else if (cond.contains("=")) {
 
@@ -699,6 +791,8 @@ public class ExprStack {
 			lhe = cond.split("=")[0];
 			rhe = cond.split("=")[1];
 			compop = "jne";
+			comp = "NE";
+
 
 		}
 
@@ -707,16 +801,26 @@ public class ExprStack {
 		IRNode irnode1 = new IRNode("LABEL", label, "", "");
 		irnode1.printNode();
 	
-		String op = "";
+		String op = "I";
 		String reg1 = newRegister();
 		String reg2 = newRegister();
+
+		//System.out.println(SymbolHashStack.getIRReg(lhe));
+		//System.out.println(SymbolHashStack.getIRReg(rhe));
+
+		if (SymbolHashStack.getIRReg(lhe) != null) {
+			lhe = SymbolHashStack.getIRReg(lhe);
+		}
+		if (SymbolHashStack.getIRReg(rhe) != null) {
+			rhe = SymbolHashStack.getIRReg(rhe);
+		}
 
 		IRNode irnodel = new IRNode("STORE"+op, lhe, reg1, "");
 		irnodel.printNode();
 		IRNode irnoder = new IRNode("STORE"+op, rhe, reg2, "");
 		irnoder.printNode();
 
-		IRNode irnode2 = new IRNode(compop, "", "", "");
+		IRNode irnode2 = new IRNode(comp, reg1, reg2, "label"+labelcount);
 		irnode2.printNode();
 
 		//Tiny
@@ -794,7 +898,7 @@ public class ExprStack {
 
 		//String t_res = newTinyReg();
 		String compop = "";
-			
+		String comp = "";
 		String lhe = "";
 		String rhe = "";
 		
@@ -803,6 +907,20 @@ public class ExprStack {
 
 
 		//dowhile equalities work in the intuitive way
+		if (cond.contains("TRUE")) {
+			lhe = "0";
+			rhe = "0";
+			compop = "jeq";
+			comp = "EQ";
+		}
+
+		if (cond == "FALSE") {
+			lhe = "1";
+			rhe = "0";
+			compop = "jeq";
+			comp = "EQ";
+		}
+
 
 		if (cond.contains("!=")) {
 			
@@ -810,20 +928,23 @@ public class ExprStack {
 			lhe = cond.split("!=")[0];
 			rhe = cond.split("!=")[1];
 			compop = "jne";
+			comp = "NE";
 			
 		} else if (cond.contains(">=")) {
 
 			//split into left and right hand expressions
 			lhe = cond.split(">=")[0];
 			rhe = cond.split(">=")[1];
-			compop = "jgt";
+			compop = "jge";
+			comp = "GE";
 
 		} else if (cond.contains("<=")) {
 
 			//split into left and right hand expressions
 			lhe = cond.split("<=")[0];
 			rhe = cond.split("<=")[1];
-			compop = "jlt";
+			compop = "jle";
+			comp = "LE";
 		
 		} else if (cond.contains(">")) {
 
@@ -831,6 +952,7 @@ public class ExprStack {
 			lhe = cond.split(">")[0];
 			rhe = cond.split(">")[1];
 			compop = "jgt";
+			comp = "GT";
 
 		} else if (cond.contains("<")) {
 	
@@ -838,6 +960,7 @@ public class ExprStack {
 			lhe = cond.split("<")[0];
 			rhe = cond.split("<")[1];
 			compop = "jlt";
+			comp = "LT";
 
 		} else if (cond.contains("=")) {
 
@@ -845,9 +968,24 @@ public class ExprStack {
 			lhe = cond.split("=")[0];
 			rhe = cond.split("=")[1];
 			compop = "jeq";
+			comp = "EQ";
 
 		}
+		
+		//IR
 
+		if (SymbolHashStack.getIRReg(lhe) != null) {
+			lhe = SymbolHashStack.getIRReg(lhe);
+		}
+		if (SymbolHashStack.getIRReg(rhe) != null) {
+			rhe = SymbolHashStack.getIRReg(rhe);
+		}
+
+		IRNode irnode2 = new IRNode(comp, lhe, rhe, dowhilelabel);
+		irnode2.printNode();	
+	
+
+		//Tiny
 		//add mov node(s)
 		TinyNode t1node = new TinyNode("move", "?", "?");
 		tinylist.add(t1node);
@@ -878,6 +1016,7 @@ public class ExprStack {
 		String optype = SymbolHashStack.checkType(op1).split("")[1];
 
 		//IR
+		SymbolHashStack.newIRNode(op1, res);
 		IRNode irnode = new IRNode("STORE"+optype, op1, res, ""); 
 		irnode.printNode();
 
